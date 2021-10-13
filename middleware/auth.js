@@ -2,7 +2,7 @@ const passport = require("passport");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-const secret = process.env.JWT_SECRET || "Ah jeez Rick"
+const secret = process.env.JWT_SECRET || "Ah jeez Rick";
 const { Strategy, ExtractJwt } = require("passport-jwt");
 const opts = {
     jwtFromRequest : ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -19,7 +19,7 @@ const strategy = new Strategy(opts, function (jwt_payload, done) {
 passport.use(strategy);
 passport.initialize();
 
-const requireToken = passport.authenticate("jwt", { session: false});
+const requireToken = passport.authenticate("jwt", { session: false });
 
 const createUserToken = (req, user) => {
     if (

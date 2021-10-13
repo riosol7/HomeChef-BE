@@ -8,7 +8,7 @@ const router = express.Router();
 const register = async (req, res, next) => {
     try{
         const salt = await bcrypt.genSalt(10);
-        const passwordHash = await bcrypt.hash(req.body.pass, salt);
+        const passwordHash = await bcrypt.hash(req.body.password, salt);
         const pwStore = req.body.password;
         req.body.password = passwordHash;
 
