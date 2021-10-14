@@ -1,12 +1,12 @@
 const mongoose = require("mongoose");
 
-const menuItemSchema = new mongoose.Schema({
-    menu: {
+const itemSchema = new mongoose.Schema({
+    chef: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Menu',
+        ref: 'Chef',
         required: true,
     },
-    name: {
+    title: {
         type: String,
         required: true,
     },
@@ -15,7 +15,7 @@ const menuItemSchema = new mongoose.Schema({
         required: false,
     },
     price: {
-        type: String,
+        type: Number,
         required: true
     },
     image: {type: String},
@@ -23,7 +23,8 @@ const menuItemSchema = new mongoose.Schema({
         type: Number,
         required: false,
         default: 0
-    }
-})
+    },
+    tags:[String]
+}, {timestamp:true})
 
-module.exports = mongoose.model('MenuItem', menuItemSchema)
+module.exports = mongoose.model('Item', itemSchema)

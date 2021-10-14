@@ -13,7 +13,30 @@ const userSchema = new mongoose.Schema({
     email: {
         type: String,
         required: false
-    }
+    },
+    firstName: { type: String },
+    lastName: { type: String },
+    address: {
+        street: String,
+        city: String,
+        zip: String,
+        state: String,
+        aptNum: String,
+        lat: Number,
+        lng: Number,
+    },
+    phone: { type: Number },
+    cart: [{
+        _id: false,
+        itemId: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Item',
+        },
+        qty: {
+            type: Number,
+            default: 1  
+        },
+    }]
 },
 {
     toJSON: {

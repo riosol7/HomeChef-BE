@@ -33,16 +33,18 @@ app.use(passport.initialize());
 //         CONTROLLERS
 // =============================
 const authController = require("./controllers/auth");
-const customerController = require("./controllers/customer");
-const chefController = require("./controllers/chef")
+const chefController = require("./controllers/chef");
+const itemController = require("./controllers/item");
+const userController = require("./controllers/user")
 
 const User = require("./models/User");
-const Customer = require("./models/Customer")
-const Chef = require("./models/Chef")
+const Chef = require("./models/Chef");
+const Item = require("./models/Item");
 
 app.use("/auth", authController);
-app.use("/customer", customerController);
-app.use("/chef", chefController);
+app.use("/:Uid/chef", chefController);
+app.use("/:Uid/item", itemController);
+app.use("/:Uid/user", userController);    
 // =============================
 //         ROUTER
 // =============================
