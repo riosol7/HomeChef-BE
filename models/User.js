@@ -34,7 +34,7 @@ const userSchema = new mongoose.Schema({
         },
         qty: {
             type: Number,
-            default: 1  
+            default: 0  
         },
     }]
 },

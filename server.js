@@ -42,9 +42,9 @@ const Chef = require("./models/Chef");
 const Item = require("./models/Item");
 
 app.use("/auth", authController);
+app.use("/:Uid", userController); 
 app.use("/:Uid/chef", chefController);
-app.use("/:Uid/item", itemController);
-app.use("/:Uid/user", userController);    
+app.use("/:Uid/item", itemController);   
 // =============================
 //         ROUTER
 // =============================
