@@ -26,19 +26,16 @@ const orderSchema = new mongoose.Schema({
             required: true
         },
     },
-    chef: {
-        chefId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Chef',
-            required: true,
-        },
-        name: {
-            type: String,
-            required: true
-        },
+    chefId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Chef',
+    },
+    chefName: {
+        type: String,
     },
     date: {
         type: String,
+        default: Date.now,
         required: true,
     },
     isPaid: {

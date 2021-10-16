@@ -4,7 +4,7 @@ const Item = require("../models/Item");
 const itemController = require("express").Router({ mergeParams: true });
 const { createUserToken, requireToken } = require("../middleware/auth")
 
-//READ
+//READ - Find all items
 itemController.get("/", async (req, res) => {
     try{
         const getItem = await Item.find()
@@ -29,10 +29,10 @@ itemController.get("/", async (req, res) => {
 //     }
 // }); 
 
-//CREATE
+//CREATE - Chef creates an item
 itemController.post("/", async (req, res) => {
     try{
-        const id = (req.user && req.user.id) || req.body.chef
+        const id = req.params.Uid || req.body.chef
         const newItem = await Item.create(req.body)
         const foundChef = await Chef.findOneAndUpdate({user:id}, { 
             "$push": { "items": newItem } 
@@ -44,7 +44,7 @@ itemController.post("/", async (req, res) => {
     }
 }); 
 
-//UPDATE
+//UPDATE 
 itemController.put('/:id', async (req, res) => {
     try{  
         const updatedItem = await Item.findByIdAndUpdate(req.params.id, req.body, {new:true})
@@ -54,7 +54,7 @@ itemController.put('/:id', async (req, res) => {
     }
 })
 
-//DESTROY
+//DESTROY - Chef destroys item
 itemController.delete('/:id', async (req, res) => {
     try {
         const deletedItem = await Item.findByIdAndRemove(req.params.id)
