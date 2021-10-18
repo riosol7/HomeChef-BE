@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 9999;
 // =============================
 //         CORS/MIDDLEWARE
 // =============================
-const whiteList = ["http://localhost:3000",  ];
+const whiteList = ["http://localhost:3000", "https://homechef-be.herokuapp.com" ];
 
 const corsOptions = {
     origin: (origin, callback) => {
