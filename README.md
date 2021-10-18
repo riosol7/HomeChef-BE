@@ -19,13 +19,13 @@ Advertise yourself here! Not only can you list all your favorite dishes, but you
 - User can update and remove items from their menu
 
 ### Entity Relationship Diagram
-![Image of ERD](./assets/ERDHOMECHEF.png)
+![Image of ERD](./assets/ERD.png)
 
 ### SiteMap 
-![Image of MAP](./assets/MAPHOMECHEF.png)
+![Image of MAP](./assets/MAP.png)
 
 ### Wireframes - mobile TBD
-![Image of mobileFrame](./assets/WIREFRAMEmobile.png)
+![Image of mobileFrame](./assets/mobile.png)
 
 ### Future Implementations
 - User can add items to their cart and place an order
