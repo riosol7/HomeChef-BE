@@ -14,21 +14,6 @@ itemController.get("/", async (req, res) => {
     }
 })
 
-//OLD
-// itemController.post("/", async (req, res) => {
-//     try{
-//         const id = (req.user && req.user.id) || req.body.chef
-//         const newItem = await Item.create(req.body)
-//         const foundChefItems = await Chef.findById(id).populate("items").exec();
-//         console.log(foundChefItems)
-//         foundChefItems.items.push(newItem)
-//         await foundChefItems.save()
-//         res.status(200).json(foundChefItems)
-//     } catch (err) {
-//         res.status(400).json({ error: err.message })
-//     }
-// }); 
-
 //CREATE - Chef creates an item
 itemController.post("/", async (req, res) => {
     try{
