@@ -27,7 +27,7 @@ const chefSchema = new mongoose.Schema({
     availability: {type: String},
     rating: {type: Number, default:0},
     items: [{
-        type: mongoose.Schema.Types.ObjectId,
+        type: mongoose.Schema.Types.Mixed,
         ref: 'Item'
     }], 
 }, {timestamps: true})

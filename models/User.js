@@ -18,18 +18,18 @@ const userSchema = new mongoose.Schema({
     lastName: { type: String },
     address: {
         street: String,
+        apt: String,
         city: String,
         zip: String,
         state: String,
-        aptNum: String,
         lat: Number,
         lng: Number,
     },
     phone: { type: Number },
     cart: [{
         _id: false,
-        itemId: {
-            type: Object,
+        item: {
+            type: mongoose.Schema.Types.Mixed,
             ref: 'Item',
         },
         qty: {

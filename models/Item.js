@@ -24,7 +24,7 @@ const itemSchema = new mongoose.Schema({
         required: false,
         default: 0
     },
-    tags:String
+    tags:[String]
 }, {timestamp:true})
 
 module.exports = mongoose.model('Item', itemSchema)

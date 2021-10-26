@@ -112,30 +112,30 @@ userController.get("/order", async (req, res) => {
 // });
 
 //UPDATE - User adds item to their cart (NEW add the entire data to cart model)
-// userController.put("/cart", async (req, res) => {
-//     try{
-//         console.log("User", req.params.Uid)
-//         console.log("Body", req.body)
-//         const id = req.params.Uid 
-//         const itemId = (req.body.item && req.body.item.id) || req.body._id
-//         console.log("Item id",itemId)
-//         const foundItem = await Item.findById(itemId)
-//         // const addToCart = await User.create(req.body)
-//         console.log("found Item",foundItem)
-//         const foundUser = await User.findOneAndUpdate({_id:id}, {
-//             "$push": { 
-//                 "cart": { 
-//                     itemId: foundItem, 
-//                     qty: req.body 
-//                 }
-//             }
-//         },{ "new": true }).populate("cart").exec();
-//         console.log(foundUser, "found User")
-//         res.status(200).json(foundUser)
-//     } catch (err) {
-//         res.status(400).json({ error: err.message })
-//     }
-// });
+userController.put("/cart", async (req, res) => {
+    try{
+        console.log("User", req.params.Uid)
+        console.log("Body", req.body)
+        const id = req.params.Uid 
+        const itemId = (req.body.item && req.body.item.id) || req.body._id
+        console.log("Item id",itemId)
+        const foundItem = await Item.findById(itemId)
+        // const addToCart = await User.create(req.body)
+        console.log("found Item",foundItem)
+        const foundUser = await User.findOneAndUpdate({_id:id}, {
+            "$push": { 
+                "cart": { 
+                    itemId: foundItem, 
+                    qty: req.body 
+                }
+            }
+        },{ "new": true }).populate("cart").exec();
+        console.log(foundUser, "found User")
+        res.status(200).json(foundUser)
+    } catch (err) {
+        res.status(400).json({ error: err.message })
+    }
+});
 
 // NEED TO ADD qty if matching ids
 // userController.put("/", async (req, res) => {

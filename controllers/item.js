@@ -14,7 +14,7 @@ itemController.get("/", async (req, res) => {
     }
 })
 
-//CREATE - Chef creates an item
+//CREATE - Chef creates an item / adds item into their array.
 itemController.post("/", async (req, res) => {
     try{
         const id = req.params.Uid || req.body.chef
@@ -29,7 +29,7 @@ itemController.post("/", async (req, res) => {
     }
 }); 
 
-//UPDATE 
+//UPDATE  NEEDS UPDATE when chef deletes item. remove it from the chef model item array
 itemController.put('/:id', async (req, res) => {
     try{  
         const updatedItem = await Item.findByIdAndUpdate(req.params.id, req.body, {new:true})
@@ -39,7 +39,7 @@ itemController.put('/:id', async (req, res) => {
     }
 })
 
-//DESTROY - Chef destroys item
+//DESTROY - Chef destroys item -- NEEDS UPDATE when chef deletes item. remove it from the chef model item array
 itemController.delete('/:id', async (req, res) => {
     try {
         const deletedItem = await Item.findByIdAndRemove(req.params.id)

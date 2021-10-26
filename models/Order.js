@@ -3,7 +3,8 @@ const mongoose = require("mongoose");
 const orderSchema = new mongoose.Schema({
     items: [{
         item: {
-            type: Object,
+            type: mongoose.Schema.Types.Mixed,
+            ref: 'Item',
             required: true,
         },
         qty: {
@@ -22,16 +23,13 @@ const orderSchema = new mongoose.Schema({
             required: true
         },
         address: { 
-            type: Object,
+            type: String,
             required: true
         },
     },
-    chefId: {
-        type: mongoose.Schema.Types.ObjectId,
+    chef: {
+        type: mongoose.Schema.Types.Mixed,
         ref: 'Chef',
-    },
-    chefName: {
-        type: String,
     },
     date: {
         type: String,
