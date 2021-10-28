@@ -140,7 +140,7 @@ itemController.delete('/:id', async (req, res) => {
             {new:true}
         )
         console.log('removeItemArr:', removeItemArr)
-
+        //NEED TO WORK ON ASAP
         const removeCartItem = await User.findOneAndUpdate(
             {
                 "cart.item._id":itemId
