@@ -89,44 +89,19 @@ userController.get("/order", async (req, res) => {
 //     }
 // })
 
-//UPDATE - User adds item to their cart -TBD WORKING?
-
-// userController.put("/cart", async (req, res) => {
-//     try{
-//         console.log("User", req.params.Uid)
-//         console.log("Body", req.body)
-//         const id = req.params.Uid 
-//         const itemId = (req.body.item && req.body.item.id) || req.body._id
-//         console.log("Item id",itemId)
-//         const foundItem = await Item.findById(itemId)
-//         // const addToCart = await User.create(req.body)
-//         console.log("found Item",foundItem)
-//         const foundUser = await User.findOneAndUpdate({_id:id}, {
-//             "$push": { "cart": req.body }
-//         },{ "new": true }).populate("cart").exec();
-//         console.log(foundUser, "found User")
-//         res.status(200).json(foundUser)
-//     } catch (err) {
-//         res.status(400).json({ error: err.message })
-//     }
-// });
-
-//UPDATE - User adds item to their cart (NEW add the entire data to cart model)
+//UPDATE - user adds item to their cart (NEEDS UPDATE: match cart.item._ids add qty)
 userController.put("/cart", async (req, res) => {
     try{
-        console.log("User", req.params.Uid)
-        console.log("Body", req.body)
         const id = req.params.Uid 
-        const itemId = (req.body.item && req.body.item.id) || req.body._id
-        console.log("Item id",itemId)
+        const itemId = req.body.item._id
+        console.log("Item id:",itemId)
         const foundItem = await Item.findById(itemId)
-        // const addToCart = await User.create(req.body)
         console.log("found Item",foundItem)
         const foundUser = await User.findOneAndUpdate({_id:id}, {
-            "$push": { 
+            $push: { 
                 "cart": { 
-                    itemId: foundItem, 
-                    qty: req.body 
+                    item: foundItem, 
+                    qty: req.body.qty 
                 }
             }
         },{ "new": true }).populate("cart").exec();
@@ -137,71 +112,28 @@ userController.put("/cart", async (req, res) => {
     }
 });
 
-// NEED TO ADD qty if matching ids
-// userController.put("/", async (req, res) => {
-//     try{
-//         console.log('testing')
-//         console.log("User", req.params.Uid)
-//         console.log("Body", req.body)
-//         const id = req.params.Uid 
-//         const itemId = (req.body.item && req.body.item.id) || req.body._id
-//         console.log("Item id",itemId)
-//         const foundItem = await Item.findById(itemId)
-//         // const addToCart = await User.create(req.body)
-//         console.log("found Item",foundItem)
-//         const foundUser = await User.findOneAndUpdate({_id:id}, {
-//             "$group":{ "$sum" : "$qty" },
-//             "$group":{ "$push": { "cart": req.body }}
-//         },
-//         { "new": true }).populate("cart").exec();
-            
-//         console.log(foundUser, "found User")
-//         res.status(200).json()
-//     } catch (err) {
-//         res.status(400).json({ error: err.message })
-//     }
-// });
 
-//UPDATE - User adds item to their cart
-//OLD
-// userController.put("/", async (req, res) => {
-//     try{
-//         console.log('testing')
-//         console.log("User", req.params.Uid)
-//         console.log("Body", req.body)
-//         const id = req.params.Uid 
-//         const itemId = (req.body.item && req.body.item.id) || req.body._id
-//         console.log(itemId)
-//         const foundItem = await Item.findById(itemId)
-//         // const addToCart = await User.create(req.body)
-//         console.log(foundItem)
-//         const foundUser = await User.findById(id).populate("cart").exec();
-//         console.log(foundUser, "testing User")
-//         foundUser.cart.push(foundItem)
-//         console.log(foundItem)
-//         await foundUser.save()
-//         res.status(200).json()
-//     } catch (err) {
-//         res.status(400).json({ error: err.message })
-//     }
-// });
-
-
-//UPDATE - User removes item from their cart
+//UPDATE - User removes item from their cart (Currently removes item if all matching criteria)
+// NEED to change so qty gets subtracted
 userController.put('/cart/:id', async (req, res) => {
     try {
         console.log("User:", req.params.Uid)
         console.log("Body:", req.body)
         const id = req.params.Uid
-        const itemId = (req.body.item && req.body.item.id) || req.body._id
+        const itemId = req.body._id || req.params.id
         console.log("itemId:", itemId)
-        const foundItem = await Item.findById(itemId || req.params.id)
+        const foundItem = await Item.findById(itemId)
         console.log("foundItem:", foundItem)
         const foundUser = await User.findOneAndUpdate({_id:id }, {
-            "$pull": { "cart": {'itemId':itemId} }
+            $pull: { 
+                "cart": {
+                    'item':foundItem,
+                    'qty': req.body.qty
+                }
+            }
         }, { new: true})
         res.status(200).json(foundUser)
-        console.log("foundUser", foundUser)
+        console.log("foundUser:", foundUser)
     } catch (err) {
         res.status(400).json({ error: err.message })
     }
