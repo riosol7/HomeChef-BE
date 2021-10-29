@@ -5,7 +5,10 @@ const Item = require("../models/Item");
 const itemController = require("express").Router({ mergeParams: true });
 const { createUserToken, requireToken } = require("../middleware/auth")
 
-//READ - Find all items
+// =============================
+//         READ
+// =============================
+// -- Find all items --
 itemController.get("/", async (req, res) => {
     try{
         const getItem = await Item.find()
@@ -15,7 +18,7 @@ itemController.get("/", async (req, res) => {
     }
 })
 
-//READ - Find item
+// -- Find item --
 itemController.get("/:id", async (req, res) => {
     try{
         const foundItem = await Item.findById(req.params.id)
@@ -25,7 +28,10 @@ itemController.get("/:id", async (req, res) => {
     }
 })
 
-//CREATE - Chef creates an item / adds item into their array.
+// =============================
+//         CREATE
+// =============================
+// -- Chef creates an item / adds item into their array --
 itemController.post("/", async (req, res) => {
     try{
         const id = req.params.Uid || req.body.chef
@@ -47,7 +53,10 @@ itemController.post("/", async (req, res) => {
     }
 }); 
 
-//UPDATE - Chef updates item, includes itemsArr, CartArr
+// =============================
+//         UPDATE
+// =============================
+// -- Chef updates item, includes itemsArr, CartArr -- WIP
 itemController.put("/:id", async (req, res) => {
     try{
         const id = req.params.Uid
@@ -109,7 +118,10 @@ itemController.put("/:id", async (req, res) => {
     }
 })
 
-//DESTROY - Chef deletes item from the db, arrays
+// =============================
+//         DELETE
+// =============================
+// -- Chef deletes item from the db, arrays -- WIP
 itemController.delete("/:id", async (req, res) => {
     try {
         const id = req.params.Uid 

@@ -6,9 +6,11 @@ const Item = require("../models/Item")
 const Order = require("../models/Order")
 const userController = require("express").Router({ mergeParams: true });
 const { createUserToken, requireToken } = require("../middleware/auth");
-const { findById } = require("../models/Chef");
 
-//READ - grab cart
+// =============================
+//         READ
+// =============================
+// -- Grab cart --
 userController.get("/cart", async (req, res) => {
     try{
         const id = req.params.Uid
@@ -21,7 +23,7 @@ userController.get("/cart", async (req, res) => {
     }
 })
 
-//READ - get user's order(s)
+// -- Get user's order(s) --
 userController.get("/order", async (req, res) => {
     try{
         const orders = await Order.find(
@@ -34,7 +36,7 @@ userController.get("/order", async (req, res) => {
     }
 })
 
-//READ - find user
+// -- Find user --
 userController.get("/", async (req, res) => {
     try{
         const user = await User.findById(req.params.Uid)
@@ -45,7 +47,10 @@ userController.get("/", async (req, res) => {
     }
 })
 
-// CREATE - User creates an order pertaining all listed information:
+// =============================
+//         CREATE
+// =============================
+// -- User creates an order pertaining all listed information: -- WIP
 // Item duplicates?
 userController.post("/order", async (req, res) => {
     try{
@@ -95,7 +100,10 @@ userController.post("/order", async (req, res) => {
     }
 })
 
-//UPDATE - user edits
+// =============================
+//         UPDATE
+// =============================
+// -- User edits --
 userController.put("/", async (req, res) => {
     try{
         const updatedUser = await User.findByIdAndUpdate(
@@ -110,7 +118,7 @@ userController.put("/", async (req, res) => {
     }
 })
 
-//UPDATE - user adds item to their cart (NEEDS UPDATE: match cart.item._ids add qty)
+// -- User adds item to their cart (NEEDS UPDATE: match cart.item._ids add qty) -- WIP
 userController.put("/cart", async (req, res) => {
     try{
         const id = req.params.Uid 
@@ -122,7 +130,8 @@ userController.put("/cart", async (req, res) => {
             {_id:id}, 
             {
                 $push: { 
-                    "cart": { 
+                    "cart": {
+                        "_id": foundItem._id, 
                         "item": foundItem, 
                         "qty": req.body.qty 
                     }
@@ -138,8 +147,8 @@ userController.put("/cart", async (req, res) => {
 });
 
 
-//UPDATE - User removes item from their cart (Currently removes item if all matching criteria)
-// NEED to change so qty gets subtracted
+// -- User removes item from their cart (Currently removes item if all matching criteria) --
+// NEED to change so qty gets subtracted -- WIP
 userController.put('/cart/:id', async (req, res) => {
     try {
         console.log("User:", req.params.Uid)
@@ -154,8 +163,9 @@ userController.put('/cart/:id', async (req, res) => {
             {
                 $pull: { 
                     "cart": {
-                        "item":foundItem,
-                        "qty":req.body.qty
+                        "_id": foundItem._id,
+                        "item": foundItem,
+                        "qty": req.body.qty
                     }
                 }
             }, 
@@ -168,7 +178,10 @@ userController.put('/cart/:id', async (req, res) => {
     }
 })
 
-//DELETE - user deleted
+// =============================
+//         DELETE
+// =============================
+// -- User deleted -- WIP
 // UPDATE : WIP once deleted, any relation to chef => item must also be deleted
 // OTHER users that contain associated items in their cart must also be removed
 userController.delete("/", async (req, res) => {
@@ -196,7 +209,7 @@ userController.delete("/", async (req, res) => {
     }
 })
 
-//DELETE - user deletes order
+// -- User deletes order --
 userController.delete("/order/:id", async (req, res) => {
     try{
         const orderId = req.params.id

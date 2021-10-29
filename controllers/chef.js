@@ -4,7 +4,10 @@ const Order = require("../models/Order");
 const chefController = require("express").Router({ mergeParams: true });
 const { createUserToken, requireToken } = require("../middleware/auth");
 
-//READ - find all Chefs
+// =============================
+//         READ
+// =============================
+// -- Find all Chefs --
 chefController.get("/", async (req, res) => {
     try{
         const chefs = await Chef.find()
@@ -14,7 +17,7 @@ chefController.get("/", async (req, res) => {
     }
 })
 
-//READ - get orders pertaining to chef
+// -- Get orders pertaining to chef --
 chefController.get("/order", async (req, res) => {
     try{
         const id = req.params.Uid
@@ -33,7 +36,7 @@ chefController.get("/order", async (req, res) => {
     }
 })
 
-//READ - find chef
+// -- Find chef --
 chefController.get("/:id", async (req, res) => {
     try{
         const foundChef = await Chef.findById(req.params.id)
@@ -43,8 +46,10 @@ chefController.get("/:id", async (req, res) => {
     }
 })
 
-
-//CREATE - new chef
+// =============================
+//         CREATE
+// =============================
+// -- New chef --
 chefController.post("/", async (req, res) => {
     try{
         const newChef = await Chef.create(req.body)
@@ -54,7 +59,10 @@ chefController.post("/", async (req, res) => {
     }
 });
 
-//UPDATE - edit chef
+// =============================
+//         UPDATE
+// =============================
+// -- Edit chef --
 chefController.put("/:id", async (req, res) => {
     try{
         const updatedChef = await Chef.findByIdAndUpdate(
@@ -69,6 +77,9 @@ chefController.put("/:id", async (req, res) => {
     }
 })
 
+// =============================
+//         DELETE
+// =============================
 //DELETE - destroy chef  
 //UPDATE WIP: once chef is deleted, items that pertain to the chef must also be pulled...
 // list: from user.cart.item, item model
