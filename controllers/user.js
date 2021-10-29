@@ -44,50 +44,55 @@ userController.get("/order", async (req, res) => {
     }
 })
 
-//CREATE? - User creates an order, pull from cart items and set to order. Order contains info regarding user, chef, & order details items -TBD
+// CREATE - User creates an order pertaining all information:
+// Item duplicates?
+userController.post("/order", async (req, res) => {
+    try{
+        console.log("User:", req.params.Uid)
+        console.log("Body:", req.body)
+        const id = req.params.Uid
+        const getUser = await User.findById(id)
+        const getCart = getUser.cart
+        console.log("getCart:", getCart)
 
-// userController.post("/order", async (req, res) => {
-//     try{
-//         console.log("User:", req.params.Uid)
-//         console.log("Body:", req.body)
-//         // console.log("Body", req.body)
-//         const id = req.params.Uid
-//         // const itemId = (req.body.item && req.body.item.id) || req.body._id
-//         // const foundItem = await Item.findById(itemId)
-//         const getUser = await User.findById(id)
-//         const getCart = getUser.cart
-//         console.log("getCart:", getCart)
-//         const pullCart = await User.findOneAndUpdate({_id:id }, {
-//             "$pull" : { "cart": getCart }
-//         }, {new: true })
-//         console.log("pullCart:", pullCart)
-//         const grabItemId = getCart.map(item => item.itemId)
-//         console.log("grabItemId:",grabItemId)
-//         const listItems = await Item.find({_id:grabItemId})
-//         console.log("listItems: ",listItems)
-//         const chefIds = listItems.map(item => item.chef)
-//         console.log("chefIds:", chefIds)
-//         const listChef = await Chef.find({_id:chefIds})
-//         console.log('listChef:',listChef)
-//         const chefIdArr = listChef.map(chef => chef._id)
-//         const chefNameArr = listChef.map(chef => chef.name)
-//         const chefName = chefNameArr[0]
-//         const chefId = chefIdArr[0] 
-//         const userInfo = await Order.create(req.body)
-//         console.log('userInfo:', userInfo)
-//         const newOrder = await Order.findOneAndUpdate({}, {
-//             "$push" : { 
-//                 "chefId": chefId,
-//                 "chefName" : chefName,
-//                 "items": getCart,
-//             }
-//         },{ "new": true }).populate('items', "chefId", "chefName").exec();
-//         console.log('new Order', newOrder)
-//         res.status(200).json(newOrder)
-//     } catch (err) {
-//         res.status(400).json({ error: err.message })
-//     }
-// })
+        const listChefIds = getCart.map(cart => cart.item.chef)
+        console.log('listChefIds:', listChefIds)
+        const chefs = await Chef.find({_id:listChefIds})
+        console.log('chefs:', chefs)
+
+        const pullCart = await User.findOneAndUpdate(
+            {_id:id},
+            {
+                $pullAll: { 
+                    "cart": getCart 
+                }
+            }, 
+            {
+                new:true,
+                multi:true
+            }
+        )
+        console.log("pullCart:", pullCart)
+
+        const userInfo = await Order.create(req.body)
+        console.log('userInfo:',userInfo)
+        const newOrder = await Order.findOneAndUpdate(
+            {"user.userId":req.body.user.userId},
+            {
+                $push: {
+                    "items":getCart,
+                    "chefs":chefs
+                }
+            },
+            {new:true}
+        )
+        console.log('newOrder:',newOrder)
+
+        res.status(200).json(newOrder)
+    } catch (err) {
+        res.status(400).json({ error: err.message })
+    }
+})
 
 //UPDATE - user adds item to their cart (NEEDS UPDATE: match cart.item._ids add qty)
 userController.put("/cart", async (req, res) => {
@@ -100,8 +105,8 @@ userController.put("/cart", async (req, res) => {
         const foundUser = await User.findOneAndUpdate({_id:id}, {
             $push: { 
                 "cart": { 
-                    item: foundItem, 
-                    qty: req.body.qty 
+                    "item": foundItem, 
+                    "qty": req.body.qty 
                 }
             }
         },{ "new": true }).populate("cart").exec();
@@ -127,11 +132,11 @@ userController.put('/cart/:id', async (req, res) => {
         const foundUser = await User.findOneAndUpdate({_id:id }, {
             $pull: { 
                 "cart": {
-                    'item':foundItem,
-                    'qty': req.body.qty
+                    "item":foundItem,
+                    "qty":req.body.qty
                 }
             }
-        }, { new: true})
+        }, {new: true})
         res.status(200).json(foundUser)
         console.log("foundUser:", foundUser)
     } catch (err) {

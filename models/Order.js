@@ -22,14 +22,23 @@ const orderSchema = new mongoose.Schema({
             type: String,
             required: true
         },
-        address: { 
-            type: String,
-            required: true
+        address: {
+            street: String,
+            apt: String,
+            city: String,
+            zip: String,
+            state: String,
+            lat: Number,
+            lng: Number,
         },
     },
-    chef: {
+    chefs: [{
         type: mongoose.Schema.Types.Mixed,
-        ref: 'Chef',
+        ref: 'Chef'
+    }],
+    status:{
+        type: String,
+        default: 'Not Accepted'
     },
     date: {
         type: String,

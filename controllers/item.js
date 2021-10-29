@@ -40,7 +40,6 @@ itemController.put('/:id', async (req, res) => {
         console.log('updatedItem:',updatedItem._id)
 
         // Find & update item from an array of objects
-
         const itemsArr = await Chef.findOneAndUpdate(
             {
                 user:id,
@@ -59,37 +58,9 @@ itemController.put('/:id', async (req, res) => {
             {
                 new:true
             }
-            
-            // {user:id},
-            // {
-            //     $set: {
-            //         "items.$[item].chef":updatedItem.chef,
-            //         "items.$[item].title":updatedItem.title,
-            //         "items.$[item].description":updatedItem.description,
-            //         "items.$[item].price":updatedItem.price,
-            //         "items.$[item].tags":updatedItem.tags
-            //     }
-            // },
-            // {
-            //     new:true,
-            //     arrayFilters:[{"item.id":{$eq:itemId}}]
-            // }
         )
            
         console.log('itemArr:',itemsArr)
-
-        // Finds the chef and doesn't update the item object with the updatedItem
-        // const itemArr = await Chef.findOneAndUpdate(
-        //     {user:id},
-        //     {$set: {"items.$[outer]": updatedItem}},
-        //     {new:true,arrayFilters: [{ "outer.id":req.params.id}]}).populate("items.$[outer]").exec();
-        // console.log('itemArr:',itemArr)
-
-        // Overrides the entire array with the updated item
-        // const updatedItemArr = await Chef.findOneAndUpdate({user:id}, {
-        //     "$set": { "items": updatedItem }
-        // }, {"new": true}).populate('items').exec();
-        // console.log('updatedItemArr:',updatedItemArr)
         
         const cartArr = await User.findOneAndUpdate(
             {
@@ -118,18 +89,15 @@ itemController.put('/:id', async (req, res) => {
     }
 })
 
-//DESTROY - Chef deletes item from the db 
-// NEEDS UPDATE to pull from the cart array as well
+//DESTROY - Chef deletes item from the db, arrays
 itemController.delete('/:id', async (req, res) => {
     try {
         const id = req.params.Uid 
-        const body = req.body
-        console.log('body:',body)
         const foundItem = await Item.findById(req.params.id)
         console.log('foundItem:',foundItem)
         let itemId = foundItem._id
         console.log('itemId:', itemId)
-        // const deletedItem = await Item.findByIdAndRemove(req.params.id)
+        const deletedItem = await Item.findByIdAndRemove(req.params.id)
         const removeItemArr = await Chef.findOneAndUpdate(
             {user:id},
             {
@@ -140,14 +108,15 @@ itemController.delete('/:id', async (req, res) => {
             {new:true}
         )
         console.log('removeItemArr:', removeItemArr)
-        //NEED TO WORK ON ASAP
+
+        //NEED TO WORK ON ASAP - removes item as null, qty remains.
         const removeCartItem = await User.findOneAndUpdate(
-            {
-                "cart.item._id":itemId
-            },
+            {"cart.item._id":itemId},
             {
                 $pull:{
-                    "cart.item":foundItem
+                    "cart":{
+                        "item":foundItem,
+                    }
                 }
             },
             {
