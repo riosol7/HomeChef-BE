@@ -5,46 +5,47 @@ const Chef = require("../models/Chef")
 const Item = require("../models/Item")
 const Order = require("../models/Order")
 const userController = require("express").Router({ mergeParams: true });
-const { createUserToken, requireToken } = require("../middleware/auth")
+const { createUserToken, requireToken } = require("../middleware/auth");
+const { findById } = require("../models/Chef");
 
-//READ - grab cart - WORKING? TBD
-// userController.get("/cart", async (req, res) => {
-//     try{
-//         console.log("User", req.params.Uid)
-//         const id = req.params.Uid
-//         const getUser = await User.findById(id)
-//         const getCart = getUser.cart
-//         console.log("getCart", getCart)
-//         const grabItemId = getCart.map(item => item.itemId)
-//         console.log("grabItemId:",grabItemId)
-//         const listItems = await Item.find({_id:grabItemId})
-//         console.log("listItems: ",listItems)
-//         const chefIds = listItems.map(item => item.chef)
-//         console.log("chefIds:", chefIds)
-//         const listChef = await Chef.find({_id:chefIds})
-//         console.log('listChef:',listChef)
-//         const chefIdArr = listChef.map(chef => chef._id)
-//         const chefNameArr = listChef.map(chef => chef.name)
-//         const chefName = chefNameArr[0]
-//         const chefId = chefIdArr[0] 
-//         const receipt = listItems.concat(getCart)
-//         console.log('receipt:',receipt)
-//         res.status(200).json(receipt)
-//     } catch (err) {
-//         res.status(400).json({ error: err.message })
-//     }
-// })
-
-//READ - get Orders
-userController.get("/order", async (req, res) => {
+//READ - grab cart
+userController.get("/cart", async (req, res) => {
     try{
-
+        const id = req.params.Uid
+        const getUser = await User.findById(id)
+        const getCart = getUser.cart
+        console.log("getCart:", getCart)
+        res.status(200).json(getCart)
     } catch (err) {
         res.status(400).json({ error: err.message })
     }
 })
 
-// CREATE - User creates an order pertaining all information:
+//READ - get user's order(s)
+userController.get("/order", async (req, res) => {
+    try{
+        const orders = await Order.find(
+            {"user.userId":req.params.Uid}
+        )
+        console.log('orders:',orders)
+        res.status(200).json(orders)
+    } catch (err) {
+        res.status(400).json({ error: err.message })
+    }
+})
+
+//READ - find user
+userController.get("/", async (req, res) => {
+    try{
+        const user = await User.findById(req.params.Uid)
+        console.log("user:", user)
+        res.status(200).json(user)
+    } catch (err) {
+        res.status(400).json({ error: err.message })
+    }
+})
+
+// CREATE - User creates an order pertaining all listed information:
 // Item duplicates?
 userController.post("/order", async (req, res) => {
     try{
@@ -94,6 +95,21 @@ userController.post("/order", async (req, res) => {
     }
 })
 
+//UPDATE - user edits
+userController.put("/", async (req, res) => {
+    try{
+        const updatedUser = await User.findByIdAndUpdate(
+            req.params.Uid,
+            req.body,
+            {new:true}
+        )
+        console.log("updatedUser:",updatedUser)
+        res.status(200).json(updatedUser)
+    } catch (err) {
+        res.status(400).json({ error: err.message })
+    }
+})
+
 //UPDATE - user adds item to their cart (NEEDS UPDATE: match cart.item._ids add qty)
 userController.put("/cart", async (req, res) => {
     try{
@@ -102,14 +118,18 @@ userController.put("/cart", async (req, res) => {
         console.log("Item id:",itemId)
         const foundItem = await Item.findById(itemId)
         console.log("found Item",foundItem)
-        const foundUser = await User.findOneAndUpdate({_id:id}, {
-            $push: { 
-                "cart": { 
-                    "item": foundItem, 
-                    "qty": req.body.qty 
+        const foundUser = await User.findOneAndUpdate(
+            {_id:id}, 
+            {
+                $push: { 
+                    "cart": { 
+                        "item": foundItem, 
+                        "qty": req.body.qty 
+                    }
                 }
-            }
-        },{ "new": true }).populate("cart").exec();
+            },
+            { "new": true }
+        ).populate("cart").exec();
         console.log(foundUser, "found User")
         res.status(200).json(foundUser)
     } catch (err) {
@@ -129,19 +149,64 @@ userController.put('/cart/:id', async (req, res) => {
         console.log("itemId:", itemId)
         const foundItem = await Item.findById(itemId)
         console.log("foundItem:", foundItem)
-        const foundUser = await User.findOneAndUpdate({_id:id }, {
-            $pull: { 
-                "cart": {
-                    "item":foundItem,
-                    "qty":req.body.qty
+        const foundUser = await User.findOneAndUpdate(
+            {_id:id}, 
+            {
+                $pull: { 
+                    "cart": {
+                        "item":foundItem,
+                        "qty":req.body.qty
+                    }
                 }
-            }
-        }, {new: true})
+            }, 
+            {new: true}
+        )
         res.status(200).json(foundUser)
         console.log("foundUser:", foundUser)
     } catch (err) {
         res.status(400).json({ error: err.message })
     }
 })
+
+//DELETE - user deleted
+// UPDATE : WIP once deleted, any relation to chef => item must also be deleted
+// OTHER users that contain associated items in their cart must also be removed
+userController.delete("/", async (req, res) => {
+    try{
+        const id = req.params.Uid
+        const deletedUser = await User.findOneAndRemove(id)
+        console.log("deletedUser:",deletedUser)
+        const deletedChef = await Chef.findOneAndRemove(id)
+        console.log("deletedChef:",deletedChef)
+        //DELETE associating items to chef
+        //WORKS?? 
+        const deletedItem = await Item.deleteMany(
+            {
+                chef:{
+                    $in:[
+                        deletedChef._id
+                    ]
+                }
+            }
+        )
+        console.log('deletedItem:', deletedItem)
+        res.status(200).json(deletedUser)
+    } catch (err) {
+        res.status(400).json({ error: err.message })
+    }
+})
+
+//DELETE - user deletes order
+userController.delete("/order/:id", async (req, res) => {
+    try{
+        const orderId = req.params.id
+        const deletedOrder = await Order.findByIdAndRemove(orderId)
+        console.log('deletedOrder:', deletedOrder)
+        res.status(200).json(deletedOrder)
+    } catch (err) {
+        res.status(400).json({ error:err.message })
+    }
+})
+
 
 module.exports = userController

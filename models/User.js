@@ -27,7 +27,10 @@ const userSchema = new mongoose.Schema({
     },
     phone: { type: Number },
     cart: [{
-        _id:false,
+        _id: {
+            type:mongoose.Schema.Types.ObjectId,
+            ref:'Item'
+        },
         item: {
             type: mongoose.Schema.Types.Mixed,
             ref: 'Item',
