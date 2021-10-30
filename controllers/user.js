@@ -50,7 +50,8 @@ userController.get("/", async (req, res) => {
 // =============================
 //         CREATE
 // =============================
-// -- User creates an order pertaining all listed information: --
+// -- User creates an order pertaining all listed information: -- WIP
+//UPDATE: Adding total price sum the price from every item
 userController.post("/order", async (req, res) => {
     try{
         console.log("User:", req.params.Uid)
@@ -179,7 +180,6 @@ userController.put('/cart/:id', async (req, res) => {
 // =============================
 //         DELETE
 // =============================
-
 // -- User deleted -- 
 userController.delete("/", async (req, res) => {
     try{

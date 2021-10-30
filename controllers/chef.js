@@ -78,6 +78,10 @@ chefController.put("/:id", async (req, res) => {
     }
 })
 
+// -- Status Change -- 
+// Chef options: Accepted, Declined, Cooking, Ready For Delivery/Pickup
+// User options: Received
+// Driver options: Delivery, Delivered
 // =============================
 //         DELETE
 // =============================
