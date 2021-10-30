@@ -56,7 +56,7 @@ itemController.post("/", async (req, res) => {
 // =============================
 //         UPDATE
 // =============================
-// -- Chef updates item, includes itemsArr, CartArr -- WIP
+// -- Chef updates item, includes itemsArr, CartArr --
 itemController.put("/:id", async (req, res) => {
     try{
         const id = req.params.Uid
@@ -68,7 +68,7 @@ itemController.put("/:id", async (req, res) => {
         )
         console.log('updatedItem:',updatedItem._id)
 
-        // Find & update item from an array of objects
+        // -- Find & update item from an array of objects --
         const itemsArr = await Chef.findOneAndUpdate(
             {
                 user:id,
@@ -90,8 +90,8 @@ itemController.put("/:id", async (req, res) => {
         )
         console.log('itemArr:',itemsArr)
         
-        // UPDATES JUST ONE USER's CART??
-        const cartArr = await User.findOneAndUpdate(
+        // -- Updates users's carts who contain the item --
+        const cartArr = await User.updateMany(
             {
                 "cart.item._id":updatedItem._id
             },
@@ -121,7 +121,7 @@ itemController.put("/:id", async (req, res) => {
 // =============================
 //         DELETE
 // =============================
-// -- Chef deletes item from the db, arrays -- WIP
+// -- Chef deletes item from the db, arrays --
 itemController.delete("/:id", async (req, res) => {
     try {
         const id = req.params.Uid 
@@ -141,13 +141,13 @@ itemController.delete("/:id", async (req, res) => {
         )
         console.log('removeItemArr:', removeItemArr)
 
-        //NEED TO WORK ON ASAP - removes item as null, qty remains.
-        const removeCartItem = await User.findOneAndUpdate(
+        // -- Remove item from users's cart --
+        const removeCartItem = await User.updateMany(
             {"cart.item._id":itemId},
             {
                 $pull:{
                     "cart":{
-                        "item":foundItem,
+                        "_id":itemId,
                     }
                 }
             },

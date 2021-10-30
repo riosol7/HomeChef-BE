@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const Chef = require("../models/Chef");
+const Item = require("../models/Item");
 const Order = require("../models/Order");
 const chefController = require("express").Router({ mergeParams: true });
 const { createUserToken, requireToken } = require("../middleware/auth");
@@ -80,32 +81,28 @@ chefController.put("/:id", async (req, res) => {
 // =============================
 //         DELETE
 // =============================
-//DELETE - destroy chef  
-//UPDATE WIP: once chef is deleted, items that pertain to the chef must also be pulled...
-// list: from user.cart.item, item model
+// -- Destroy chef -- WIP   
+//ISSUE: upon deletion cart item remains an empty with qty at 0?
 chefController.delete("/:id", async (req, res) => {
     try{
-        const deletedChef = await Chef.findByIdAndRemove(req.params.id)
+        const id = req.params.Uid
+        const deletedChef = await Chef.findOneAndRemove({user:id})
         console.log('deletedChef:', deletedChef)
+
+        // -- Delete items associated with chef.id  --
         const deletedItem = await Item.deleteMany(
-            {
-                chef:{
-                    $in:[
-                        deletedChef._id
-                    ]
-                }
-            }
+            {"chef":deletedChef._id}
         )
         console.log('deletedItem:', deletedItem)
-
-        //NEED TO WORK ON ASAP - removes item as null, qty remains. (TEST!! NOW)
-        //ALSO needs to delete item from all users that contain it.
-        // Need to pull items that match the chef.ids, then remove all by matching the item or using id to get rid of all?
+        
+        // -- Remove items from Users's cart associated with chef.id -- 
         const removeCartItem = await User.updateMany(
-            {"cart.item.chef":req.params.id},
+            {"cart.chef":deletedChef._id},
             {
-                $pull:{
-                    "cart.item.chef":deletedChef._id
+                "cart": {
+                    $pullAll: {
+                        "chef":deletedChef._id
+                    }
                 }
             },
             {
@@ -114,6 +111,24 @@ chefController.delete("/:id", async (req, res) => {
             }
         )
         console.log('removeCartItem:', removeCartItem)
+
+        // -- Removes the empty object?? --
+        const removeEmptyObj = await User.updateMany(
+            {"cart.qty":0},
+            {
+                "cart" : {
+                    $pullAll:{
+                        "qty":0
+                    }
+                }
+            },
+            {
+                new:true,
+                multi:true
+            }
+        )
+        console.log('removeEmptyObj:', removeEmptyObj)
+
         res.status(200).json(deletedChef)
     } catch (err) {
         res.status(400).json({ error: err.message })

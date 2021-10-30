@@ -31,6 +31,10 @@ const userSchema = new mongoose.Schema({
             type:mongoose.Schema.Types.ObjectId,
             ref:'Item'
         },
+        chef:{
+            type: mongoose.Schema.Types.ObjectId,
+            ref:'Chef'
+        },
         item: {
             type: mongoose.Schema.Types.Mixed,
             ref: 'Item',

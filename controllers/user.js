@@ -50,8 +50,7 @@ userController.get("/", async (req, res) => {
 // =============================
 //         CREATE
 // =============================
-// -- User creates an order pertaining all listed information: -- WIP
-// Item duplicates?
+// -- User creates an order pertaining all listed information: --
 userController.post("/order", async (req, res) => {
     try{
         console.log("User:", req.params.Uid)
@@ -131,7 +130,8 @@ userController.put("/cart", async (req, res) => {
             {
                 $push: { 
                     "cart": {
-                        "_id": foundItem._id, 
+                        "_id": foundItem._id,
+                        "chef": foundItem.chef, 
                         "item": foundItem, 
                         "qty": req.body.qty 
                     }
@@ -139,7 +139,7 @@ userController.put("/cart", async (req, res) => {
             },
             { "new": true }
         ).populate("cart").exec();
-        console.log(foundUser, "found User")
+        console.log("found User:",foundUser)
         res.status(200).json(foundUser)
     } catch (err) {
         res.status(400).json({ error: err.message })
@@ -147,8 +147,7 @@ userController.put("/cart", async (req, res) => {
 });
 
 
-// -- User removes item from their cart (Currently removes item if all matching criteria) --
-// NEED to change so qty gets subtracted -- WIP
+// -- User removes item from their cart (Removes entire item by id) -- 
 userController.put('/cart/:id', async (req, res) => {
     try {
         console.log("User:", req.params.Uid)
@@ -164,8 +163,7 @@ userController.put('/cart/:id', async (req, res) => {
                 $pull: { 
                     "cart": {
                         "_id": foundItem._id,
-                        "item": foundItem,
-                        "qty": req.body.qty
+                        // "qty": req.body.qty
                     }
                 }
             }, 
@@ -181,28 +179,56 @@ userController.put('/cart/:id', async (req, res) => {
 // =============================
 //         DELETE
 // =============================
-// -- User deleted -- WIP
-// UPDATE : WIP once deleted, any relation to chef => item must also be deleted
-// OTHER users that contain associated items in their cart must also be removed
+
+// -- User deleted -- 
 userController.delete("/", async (req, res) => {
     try{
         const id = req.params.Uid
-        const deletedUser = await User.findOneAndRemove(id)
+        const deletedUser = await User.findOneAndRemove({_id:id})
         console.log("deletedUser:",deletedUser)
-        const deletedChef = await Chef.findOneAndRemove(id)
+        const deletedChef = await Chef.findOneAndRemove({user:id})
         console.log("deletedChef:",deletedChef)
-        //DELETE associating items to chef
-        //WORKS?? 
+        
+        // -- Delete items associated with chef.id  --
         const deletedItem = await Item.deleteMany(
-            {
-                chef:{
-                    $in:[
-                        deletedChef._id
-                    ]
-                }
-            }
+            {"chef":deletedChef._id}
         )
         console.log('deletedItem:', deletedItem)
+         
+        // -- Remove items from Users's cart associated with chef.id -- 
+        const removeCartItem = await User.updateMany(
+            {"cart.chef":deletedChef._id},
+            {
+                "cart": {
+                    $pullAll: {
+                        "chef":deletedChef._id
+                    }
+                }
+            },
+            {
+                new:true,
+                multi:true
+            }
+        )
+        console.log('removeCartItem:', removeCartItem)
+
+        // -- Removes the empty object --
+        const removeEmptyObj = await User.updateMany(
+            {"cart.qty":0},
+            {
+                "cart" : {
+                    $pullAll:{
+                        "qty":0
+                    }
+                }
+            },
+            {
+                new:true,
+                multi:true
+            }
+        )
+        console.log('removeEmptyObj:', removeEmptyObj)
+
         res.status(200).json(deletedUser)
     } catch (err) {
         res.status(400).json({ error: err.message })
