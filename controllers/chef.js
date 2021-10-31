@@ -78,10 +78,24 @@ chefController.put("/:id", async (req, res) => {
     }
 })
 
-// -- Status Change -- 
+// -- Order status -- 
 // Chef options: Accepted, Declined, Cooking, Ready For Delivery/Pickup
 // User options: Received
 // Driver options: Delivery, Delivered
+chefController.put("/order/:id", async (req, res) => {
+    try{
+        const updatedOrder = await Order.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            {new:true}
+        )
+        console.log('updatedOrder:', updatedOrder)
+        res.status(200).json(updatedOrder)
+    } catch (err) {
+        res.status(400).json({ error: err.message })
+    }
+})
+
 // =============================
 //         DELETE
 // =============================

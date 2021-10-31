@@ -84,9 +84,7 @@ itemController.put("/:id", async (req, res) => {
                     "items.$.tags":updatedItem.tags
                 }
             },
-            {
-                new:true
-            }
+            {new:true}
         )
         console.log('itemArr:',itemsArr)
         

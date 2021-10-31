@@ -11,6 +11,10 @@ const orderSchema = new mongoose.Schema({
             type: Number,
             required: true,
         },
+        total: {
+            type: Number,
+            required: true
+        }
     }],
     user: {
         userId: {
@@ -48,6 +52,9 @@ const orderSchema = new mongoose.Schema({
     isPaid: {
         type: Boolean,
         default: false
+    },
+    grandTotal: {
+        type: Number
     },
     note: { type: String }
 }, {timestamp:true})

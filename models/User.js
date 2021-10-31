@@ -28,7 +28,7 @@ const userSchema = new mongoose.Schema({
     phone: { type: Number },
     cart: [{
         _id: {
-            type:mongoose.Schema.Types.ObjectId,
+            type: mongoose.Schema.Types.ObjectId,
             ref:'Item'
         },
         chef:{
@@ -43,6 +43,29 @@ const userSchema = new mongoose.Schema({
             type: Number,
             default: 0  
         },
+        total: {
+            type: Number
+        }
+    }],
+    favs: [{
+        _id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Chef'
+        },
+        chef: {
+            type: mongoose.Schema.Types.Mixed,
+            ref: 'Chef'
+        }
+    }],
+    orderHistory: [{
+        _id: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Order'
+        },
+        order: {
+            type: mongoose.Schema.Types.Mixed,
+            ref: 'Order'
+        }
     }]
 },
 {
