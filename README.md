@@ -15,8 +15,9 @@ Advertise yourself here! Not only can you list all your favorite dishes, but you
 
 ### User Stories
 - User can create a chef account and add items to their menu
-- User can see all listed items that other chefs have posted
 - User can update and remove items from their menu
+- User can add items to their cart and place an order
+- Chef can update status of the order
 
 ### Entity Relationship Diagram
 ![Image of ERD](./assets/ERD.png)
@@ -28,10 +29,8 @@ Advertise yourself here! Not only can you list all your favorite dishes, but you
 ![Image of mobileFrame](./assets/mobile.png)
 
 ### Future Implementations
-- User can add items to their cart and place an order
-- User can delete an order if not accepted by the chef
 - User can create a delivery account
 - User can filter items by ratings or by tags
-- Google Map API & Auth API
+- Google API
 - PayPal API 
 - And much more! 
