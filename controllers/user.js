@@ -50,8 +50,7 @@ userController.get("/", async (req, res) => {
 // =============================
 //         CREATE
 // =============================
-// -- User creates an order pertaining all listed information: -- WIP
-//UPDATE: Adding total price - qty * price from every item
+// -- User creates an order pertaining all listed information: -- 
 userController.post("/order", async (req, res) => {
     try{
         console.log("User:", req.params.Uid)
@@ -80,10 +79,10 @@ userController.post("/order", async (req, res) => {
         )
         console.log("pullCart:", pullCart)
 
-        const userInfo = await Order.create(req.body)
-        console.log('userInfo:',userInfo)
+        const orderInfo = await Order.create(req.body)
+        console.log('orderInfo:',orderInfo)
         const newOrder = await Order.findOneAndUpdate(
-            {"user.userId":req.body.user.userId},
+            {_id:orderInfo._id},
             {
                 $push: {
                     "items":getCart,
@@ -94,15 +93,22 @@ userController.post("/order", async (req, res) => {
         )
         console.log('newOrder:',newOrder)
 
-        // First, items.total += (sum all items)
+        // -- Calculate Grand Total --
         const itemsTotalArr = newOrder.items.map(item => item.total)
         console.log('itemsTotalArr:', itemsTotalArr)
-        const sum = itemsTotalArr.map((x, idx) => itemsTotalArr.reduce((sum, curr) => sum + curr[idx]))
+        const sum = itemsTotalArr.reduce((acc, val) => acc + val, 0)
         console.log('sum:', sum)
 
-        // const grandTotal
-        // Second, push the variable that stores the total amt in findOneAndUpdate
-        // Last,TEST
+        const grandTotal = await Order.findByIdAndUpdate(
+            newOrder._id,
+            {
+                $set: {
+                    "grandTotal":sum
+                }
+            },
+            {new:true} 
+        )
+        console.log("grandTotal:",grandTotal)
 
         res.status(200).json(newOrder)
     } catch (err) {

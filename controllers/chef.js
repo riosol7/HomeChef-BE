@@ -134,15 +134,14 @@ chefController.delete("/:id", async (req, res) => {
         const removeEmptyObj = await User.updateMany(
             {"cart.qty":0},
             {
-                "cart" : {
-                    $pullAll:{
+                "cart":{
+                    $pull:{
                         "qty":0
                     }
                 }
             },
             {
-                new:true,
-                multi:true
+                new:true
             }
         )
         console.log('removeEmptyObj:', removeEmptyObj)
