@@ -118,7 +118,7 @@ userController.put("/", async (req, res) => {
     }
 })
 
-// -- User adds item to their cart (NEEDS UPDATE: match cart.item._ids add qty) -- WIP
+// -- User adds item to their cart (matching itemID, sum Qty) --
 userController.put("/cart", async (req, res) => {
     try{
         const id = req.params.Uid 
@@ -126,6 +126,7 @@ userController.put("/cart", async (req, res) => {
         console.log("Item id:",itemId)
         const foundItem = await Item.findById(itemId)
         console.log("found Item",foundItem)
+        // -- Adds item to their cart -- 
         const foundUser = await User.findOneAndUpdate(
             {_id:id}, 
             {
@@ -138,9 +139,58 @@ userController.put("/cart", async (req, res) => {
                     }
                 }
             },
-            { "new": true }
+            {new: true}
         ).populate("cart").exec();
         console.log("found User:",foundUser)
+
+        // -- Total Qty of Matching Item IDs --
+        const matchingItems = foundUser.cart.filter(
+            item => item._id = foundItem._id
+        );
+        console.log('matchingItems:', matchingItems)
+        const qtyTotal = matchingItems.reduce((prev, cur) => prev + cur.qty, 0);
+        console.log("qtyTotal:", qtyTotal) 
+        const updateQty = await User.findOneAndUpdate(
+            {
+                _id:id,
+                "cart._id":foundItem._id,
+            },
+            {
+                $set:{
+                    "cart.$.qty":qtyTotal
+                }
+            },
+            {new:true}
+        )
+        console.log('updateQty:', updateQty)
+        
+        // -- Remove duplicate Items --
+        const removeDuplicateItems = await User.findOneAndUpdate(
+            {
+                _id:id,
+                "cart._id":foundItem._id,
+            },
+            {
+                $unset:{
+                    "cart.1": 1
+                }
+            },
+            {new:true}
+        )
+        console.log('removeDuplicateItems:', removeDuplicateItems)
+
+        // -- Remove null --
+        const removeNull = await User.findOneAndUpdate(
+            {_id:id},
+            {
+                $pull: {
+                    "cart":null
+                }
+            },
+            {new:true}
+        )
+        console.log('removeNull:', removeNull)
+
         res.status(200).json(foundUser)
     } catch (err) {
         res.status(400).json({ error: err.message })
@@ -168,7 +218,7 @@ userController.put('/cart/:id', async (req, res) => {
                     }
                 }
             }, 
-            {new: true}
+            {new:true}
         )
         res.status(200).json(foundUser)
         console.log("foundUser:", foundUser)
