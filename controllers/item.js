@@ -47,7 +47,7 @@ itemController.post("/", async (req, res) => {
             { "new": true }
         ).populate('items').exec();
         console.log("foundChef:",foundChef)
-        res.status(200).json(foundChef)
+        res.status(200).json(newItem)
     } catch (err) {
         res.status(400).json({ error: err.message })
     }
