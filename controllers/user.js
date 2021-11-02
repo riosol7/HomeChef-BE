@@ -138,106 +138,64 @@ userController.put("/", async (req, res) => {
 userController.put("/cart", async (req, res) => {
     try{
         const id = req.params.Uid 
-        const itemId = req.body.item._id
+        const itemId = req.body._id
         console.log("itemId:",itemId)
         const foundItem = await Item.findById(itemId)
         console.log("found Item",foundItem)
         const total = foundItem.price * req.body.qty
-        // -- Adds item to their cart -- 
-        const foundUser = await User.findOneAndUpdate(
-            {_id:id}, 
-            {
-                $push: { 
-                    "cart": {
-                        "_id": foundItem._id,
-                        "chef": foundItem.chef, 
-                        "item": foundItem, 
-                        "qty": req.body.qty,
-                        "total": total
-                    }
-                }
-            },
-            {new: true}
-        ).populate("cart").exec();
-        console.log("found User:",foundUser)
 
-        // -- Total Qty of Matching Item IDs --
-        const matchingItems = foundUser.cart.filter(
+        const getUser = await User.findOne({_id:id})
+        console.log("getUser:",getUser)
+
+
+        const checkCart = getUser.cart.filter(
             item => item.item.title === foundItem.title
         );
-        console.log('matchingItems:', matchingItems)
-        
-        const matchIdsArr = matchingItems.map(item => item._id)
-        const matchId = matchIdsArr[0].toString();
-        console.log('matchId:', matchId)
+        console.log('checkCart:', checkCart)
 
-        if(matchingItems[1]){
-            const qtyTotal = matchingItems.reduce((prev, cur) => prev + cur.qty, 0);
-            console.log("qtyTotal:", qtyTotal) 
-            const updateQty = await User.findOneAndUpdate(
+        if(checkCart[0]){
+            const oldQty = checkCart[0].qty
+            console.log("oldQty:",oldQty)
+            const oldTotal = checkCart[0].total
+            console.log("oldTotal:",oldTotal)
+            const newQty = oldQty + parseInt(req.body.qty)
+            const newTotal = newQty * foundItem.price
+            console.log("newQty:",newQty)
+            console.log("newTotal:",newTotal)
+            const newQty_Total = await User.findOneAndUpdate(
                 {
                     _id:id,
                     "cart._id":foundItem._id,
                 },
                 {
                     $set:{
-                        "cart.$.qty":qtyTotal
-                    }
-                },
-                {new:true}
-            )
-            console.log('updateQty:', updateQty)
-
-            const removeDuplicateItems = await User.findOneAndUpdate(
-                {
-                    _id:id,
-                    "cart._id":foundItem._id,
-                },
-                {
-                    $unset:{
-                        "cart.1": 1
-                    }
-                },
-                {new:true}
-            )
-            console.log('removeDuplicateItems:', removeDuplicateItems)
-    
-            // -- Remove null --
-            const removeNull = await User.findOneAndUpdate(
-                {_id:id},
-                {
-                    $pull: {
-                        "cart":null
-                    }
-                },
-                {new:true}
-            )
-            console.log('removeNull:', removeNull)
-    
-            // -- Calculate total --
-            const qtyArr = removeNull.cart.map(item => item.qty)
-            let qty = qtyArr.toString();
-            console.log('qty:',qty)
-            const newTotal = foundItem.price * qty
-            console.log('newTotal:',newTotal)
-            const itemTotal = await User.findOneAndUpdate(
-                {
-                    _id:id,
-                    "cart._id":foundItem._id,
-                },
-                {
-                    $set:{
+                        "cart.$.qty":newQty,
                         "cart.$.total":newTotal
                     }
                 },
                 {new:true}
             )
-            console.log("itemTotal:",itemTotal)
-            res.status(200).json(itemTotal)
+            console.log("newQty_Total",newQty_Total)
+            res.status(200).json(newQty_Total)
         } else {
+            const foundUser = await User.findOneAndUpdate(
+                {_id:id}, 
+                {
+                    $push: { 
+                        "cart": {
+                            "_id": foundItem._id,
+                            "chef": foundItem.chef, 
+                            "item": foundItem, 
+                            "qty": req.body.qty,
+                            "total": total
+                        }
+                    }
+                },
+                {new: true}
+            ).populate("cart").exec();
+            console.log("found User:",foundUser)
             res.status(200).json(foundUser)
         }
-        
     } catch (err) {
         res.status(400).json({ error: err.message })
     }

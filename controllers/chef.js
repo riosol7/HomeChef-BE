@@ -8,23 +8,23 @@ const { createUserToken, requireToken } = require("../middleware/auth");
 // =============================
 //         READ
 // =============================
-// // -- Find all Chefs --
-chefController.get("/", async (req, res) => {
-    try{
-        const chefs = await Chef.find()
-        res.status(200).json(chefs)
-    } catch (err) {
-        res.status(400).json({ error: err.message })
-    }
-})
-
 // -- Find Chef --
-chefController.get("/ID", async (req, res) => {
+chefController.get("/", async (req, res) => {
     try{
         const id = req.params.Uid
         const chef = await Chef.findOne({user:id})
         console.log("chef:",chef)
         res.status(200).json(chef)
+    } catch (err) {
+        res.status(400).json({ error: err.message })
+    }
+})
+
+// // -- Find all Chefs --
+chefController.get("/all", async (req, res) => {
+    try{
+        const chefs = await Chef.find()
+        res.status(200).json(chefs)
     } catch (err) {
         res.status(400).json({ error: err.message })
     }

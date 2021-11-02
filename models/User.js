@@ -44,7 +44,8 @@ const userSchema = new mongoose.Schema({
             default: 0  
         },
         total: {
-            type: Number
+            type: Number,
+            default: 0
         }
     }],
     favs: [{
