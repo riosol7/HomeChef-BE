@@ -22,10 +22,8 @@ const orderSchema = new mongoose.Schema({
             ref: 'User',
             required: true,
         },
-        name: {
-            type: String,
-            required: true
-        },
+        firstName: { type: String },
+        lastName: { type: String },
         address: {
             street: String,
             apt: String,
@@ -35,6 +33,8 @@ const orderSchema = new mongoose.Schema({
             lat: Number,
             lng: Number,
         },
+        phone: { type: Number },
+        deliveryInstructions: {type: String}
     },
     chefs: [{
         type: mongoose.Schema.Types.Mixed,
