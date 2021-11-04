@@ -143,10 +143,14 @@ userController.put("/cart", async (req, res) => {
         const foundItem = await Item.findById(itemId)
         console.log("found Item",foundItem)
         const total = foundItem.price * req.body.qty
+        const roundToHundredth = (value) => {
+            return Number(value.toFixed(2));
+        }
+        const roundTotal = roundToHundredth(total)
+        console.log("roundTotal",roundTotal)
 
         const getUser = await User.findOne({_id:id})
         console.log("getUser:",getUser)
-
 
         const checkCart = getUser.cart.filter(
             item => item.item.title === foundItem.title
@@ -162,6 +166,11 @@ userController.put("/cart", async (req, res) => {
             const newTotal = newQty * foundItem.price
             console.log("newQty:",newQty)
             console.log("newTotal:",newTotal)
+            const roundToHundredth = (value) => {
+                return Number(value.toFixed(2));
+            }
+            const roundNewTotal = roundToHundredth(newTotal)
+            console.log("roundNewTotal:", roundNewTotal)
             const newQty_Total = await User.findOneAndUpdate(
                 {
                     _id:id,
@@ -170,7 +179,7 @@ userController.put("/cart", async (req, res) => {
                 {
                     $set:{
                         "cart.$.qty":newQty,
-                        "cart.$.total":newTotal
+                        "cart.$.total":roundNewTotal
                     }
                 },
                 {new:true}
@@ -187,7 +196,7 @@ userController.put("/cart", async (req, res) => {
                             "chef": foundItem.chef, 
                             "item": foundItem, 
                             "qty": req.body.qty,
-                            "total": total
+                            "total": roundTotal
                         }
                     }
                 },
@@ -202,7 +211,7 @@ userController.put("/cart", async (req, res) => {
 });
 
 
-// -- User removes item from their cart (Removes entire item by id) -- 
+// User updates cart (new: Qty, Total)/ Removes item from cart
 userController.put('/cart/:id', async (req, res) => {
     try {
         console.log("User:", req.params.Uid)
@@ -212,20 +221,58 @@ userController.put('/cart/:id', async (req, res) => {
         console.log("itemId:", itemId)
         const foundItem = await Item.findById(itemId)
         console.log("foundItem:", foundItem)
-        const foundUser = await User.findOneAndUpdate(
-            {_id:id}, 
-            {
-                $pull: { 
-                    "cart": {
-                        "_id": foundItem._id,
-                        // "qty": req.body.qty
+
+        const getUser = await User.findOne({_id:id})
+        console.log("getUser:",getUser)
+
+
+        const checkCart = getUser.cart.filter(
+            item => item.item.title === foundItem.title
+        );
+        console.log("checkCart:",checkCart)
+        const oldQty = checkCart[0].qty
+        console.log("oldQty:",oldQty)
+        const oldTotal = checkCart[0].total
+        console.log("oldTotal:",oldTotal)
+
+        // -- User removes item from their cart (Removes entire item by id) -- 
+        if(req.body.qty === "Remove"){
+            const foundUser = await User.findOneAndUpdate(
+                {_id:id}, 
+                {
+                    $pull: { 
+                        "cart": {
+                            "_id": foundItem._id,
+                            // "qty": req.body.qty
+                        }
                     }
-                }
-            }, 
-            {new:true}
-        )
-        res.status(200).json(foundUser)
-        console.log("foundUser:", foundUser)
+                }, 
+                {new:true}
+            )
+            res.status(200).json(foundUser)
+            console.log("foundUser:", foundUser)
+        } else {
+            // -- User updates qty, changing total --
+            const newQty = req.body.qty
+            const newTotal = newQty * foundItem.price
+            console.log("newQty:",newQty)
+            console.log("newTotal:",newTotal)
+            const updateCart = await User.findOneAndUpdate(
+                {
+                    _id:id,
+                    "cart._id":foundItem._id,
+                },
+                {
+                    $set: { 
+                        "cart.$.qty":newQty,
+                        "cart.$.total":newTotal
+                    }
+                }, 
+                {new:true}
+            )
+            res.status(200).json(updateCart)
+            console.log("updateCart:", updateCart)
+        }
     } catch (err) {
         res.status(400).json({ error: err.message })
     }
