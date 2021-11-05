@@ -53,6 +53,9 @@ const orderSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    subTotal: {
+        type: Number
+    },
     grandTotal: {
         type: Number
     },

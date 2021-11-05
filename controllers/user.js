@@ -79,14 +79,30 @@ userController.post("/order", async (req, res) => {
         )
         console.log("pullCart:", pullCart)
 
-        const orderInfo = await Order.create(req.body)
+        const orderInfo = await Order.create({
+            user: {
+                userId: getUser._id,
+                firstName: req.body.firstName,
+                lastName: req.body.lastName,
+                address:{
+                    street: req.body.street,
+                    apt: req.body.apt,
+                    city: req.body.city,
+                    zip: req.body.zip,
+                    state: req.body.state
+                },
+                phone: req.body.phone,
+                deliveryInstructions: req.body.deliveryInstructions
+            },
+            grandTotal: req.body.grandTotal
+        })
         console.log('orderInfo:',orderInfo)
         const newOrder = await Order.findOneAndUpdate(
             {_id:orderInfo._id},
             {
                 $push: {
                     "items":getCart,
-                    "chefs":chefs
+                    "chefs":chefs,
                 }
             },
             {new:true}
@@ -99,16 +115,16 @@ userController.post("/order", async (req, res) => {
         const sum = itemsTotalArr.reduce((acc, val) => acc + val, 0)
         console.log('sum:', sum)
 
-        const grandTotal = await Order.findByIdAndUpdate(
+        const subTotal = await Order.findByIdAndUpdate(
             newOrder._id,
             {
                 $set: {
-                    "grandTotal":sum
+                    "subTotal":sum
                 }
             },
             {new:true} 
         )
-        console.log("grandTotal:",grandTotal)
+        console.log("subTotal:",subTotal)
 
         res.status(200).json(newOrder)
     } catch (err) {
