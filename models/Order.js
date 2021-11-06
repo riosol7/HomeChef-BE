@@ -56,6 +56,10 @@ const orderSchema = new mongoose.Schema({
     subTotal: {
         type: Number
     },
+    tip: {
+        type: Number,
+        default: 0
+    },
     grandTotal: {
         type: Number
     },

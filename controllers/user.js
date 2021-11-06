@@ -94,7 +94,7 @@ userController.post("/order", async (req, res) => {
                 phone: req.body.phone,
                 deliveryInstructions: req.body.deliveryInstructions
             },
-            grandTotal: req.body.grandTotal
+            tip: req.body.tip
         })
         console.log('orderInfo:',orderInfo)
         const newOrder = await Order.findOneAndUpdate(
@@ -109,17 +109,28 @@ userController.post("/order", async (req, res) => {
         )
         console.log('newOrder:',newOrder)
 
-        // -- Calculate Grand Total --
+        // -- Calculate Sub/Grand Total --
+        const roundToHundredth = (value) => {
+            return Number(value.toFixed(2));
+        }
         const itemsTotalArr = newOrder.items.map(item => item.total)
         console.log('itemsTotalArr:', itemsTotalArr)
         const sum = itemsTotalArr.reduce((acc, val) => acc + val, 0)
         console.log('sum:', sum)
+        const deliveryFee = 1.99
+        const tax = sum * .095//CA TAX
+        const roundTaxes = roundToHundredth(tax)
+        const roundSum = roundToHundredth(sum)
+        const grandTotal = roundSum + Number(req.body.tip) + deliveryFee + roundTaxes
+        let roundGrandTotal = roundToHundredth(grandTotal)
+        console.log("roundGrandTotal:",roundGrandTotal)
 
         const subTotal = await Order.findByIdAndUpdate(
             newOrder._id,
             {
                 $set: {
-                    "subTotal":sum
+                    "subTotal":roundSum,
+                    "grandTotal":roundGrandTotal,
                 }
             },
             {new:true} 
