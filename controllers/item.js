@@ -22,6 +22,7 @@ itemController.get("/", async (req, res) => {
 itemController.get("/:id", async (req, res) => {
     try{
         const foundItem = await Item.findById(req.params.id)
+        console.log(foundItem)
         res.status(200).json(foundItem)
     } catch (err) {
         res.status(400).json({ error: err.message })
