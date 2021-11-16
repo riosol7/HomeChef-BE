@@ -14,11 +14,16 @@ const itemSchema = new mongoose.Schema({
         type: String,
         required: false,
     },
+    options: [String],
     price: {
         type: Number,
         required: true
     },
     image: {type: String},
+    timeDuration: {
+        type: String,
+        required: true
+    },
     likes:{
         type: Number,
         required: false,

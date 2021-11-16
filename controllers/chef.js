@@ -1,3 +1,4 @@
+const mongoose = require("mongoose")
 const User = require("../models/User");
 const Chef = require("../models/Chef");
 const Item = require("../models/Item");
@@ -49,9 +50,27 @@ chefController.get("/order", async (req, res) => {
     }
 })
 
-// -- Find chef --
+// -- Find chef By item --
+chefController.get("/item/:id", async (req, res) => {
+    try{
+        const itemId = mongoose.Types.ObjectId(req.params.id)
+        console.log("itemId:", itemId)
+            const foundChef = await Chef.findOne({
+                "items._id": itemId 
+            })
+            res.status(200).json(foundChef)
+            console.log('foundChef',foundChef)
+        
+    } catch (err) {
+        res.status(400).json({ error: err.message })
+    }
+})
+
+// -- Find chef By ID --
 // chefController.get("/:id", async (req, res) => {
 //     try{
+//         cId = req.params.id
+//         console.log("cId:", cId)
 //         const foundChef = await Chef.findById(req.params.id)
 //         res.status(200).json(foundChef)
 //     } catch (err) {
