@@ -97,13 +97,36 @@ chefController.post("/", async (req, res) => {
 // -- Edit chef --
 chefController.put("/:id", async (req, res) => {
     try{
-        const updatedChef = await Chef.findByIdAndUpdate(
-            req.params.id, 
-            req.body, 
-            {new:true}
-        )
-        console.log('updatedChef:',updatedChef) 
-        res.status(200).json(updatedChef)
+        console.log('Body:',req.body)
+        if(req.body.street){
+            const updatedChef = await Chef.findByIdAndUpdate(
+                req.params.id, 
+                {
+                    "name": req.body.name,
+                    "bio": req.body.bio,
+                    "image": req.body.image,
+                    "phone": req.body.phone,
+                    "availability": req.body.availability, 
+                    "address": {
+                        "street": req.body.street,
+                        "city": req.body.city,
+                        "state": req.body.state,
+                        "zip": req.body.zip
+                    }
+                }, 
+                {new:true}
+            )
+            console.log('updatedChef:',updatedChef) 
+            res.status(200).json(updatedChef)
+        } else {
+            const updatedChef = await Chef.findByIdAndUpdate(
+                req.params.id, 
+                req.body, 
+                {new:true}
+            )
+            console.log('updatedChef:',updatedChef) 
+            res.status(200).json(updatedChef)
+        }
     } catch (err) {
         res.status(400).json({ error: err.message })
     }
