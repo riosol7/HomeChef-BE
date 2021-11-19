@@ -67,6 +67,15 @@ const userSchema = new mongoose.Schema({
             type: mongoose.Schema.Types.Mixed,
             ref: 'Order'
         }
+    }],
+    savedAddress: [{
+        street: String,
+        apt: String,
+        city: String,
+        zip: String,
+        state: String,
+        lat: Number,
+        lng: Number
     }]
 },
 {

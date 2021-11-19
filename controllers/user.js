@@ -92,6 +92,7 @@ userController.post("/order", async (req, res) => {
                     state: req.body.state
                 },
                 phone: req.body.phone,
+                email:req.body.email,
                 deliveryInstructions: req.body.deliveryInstructions
             },
             tip: req.body.tip
@@ -149,13 +150,55 @@ userController.post("/order", async (req, res) => {
 // -- User edits --
 userController.put("/", async (req, res) => {
     try{
-        const updatedUser = await User.findByIdAndUpdate(
+        if(req.body.street){
+            const savedAddress = await User.findByIdAndUpdate(
+                req.params.Uid,
+                {
+                    $push :{
+                        "savedAddress":{
+                            "street": req.body.street,
+                            "apt": req.body.apt,
+                            "city": req.body.city,
+                            "zip": req.body.zip,
+                            "state": req.body.state,
+                        }
+                    }
+                },
+                {new:true}
+            )
+            console.log("savedAddress:", savedAddress)
+            res.status(200).json(savedAddress)
+        } else {
+            const updatedUser = await User.findByIdAndUpdate(
+                req.params.Uid,
+                req.body,
+                {new:true}
+            )
+            console.log("updatedUser:",updatedUser)
+            res.status(200).json(updatedUser)
+        }
+    } catch (err) {
+        res.status(400).json({ error: err.message })
+    }
+})
+
+// -- Remove Address --
+userController.put("/removeAddress/:id", async (req, res) => {
+    try{
+        const addressId = mongoose.Types.ObjectId(req.params.id)
+        const removeAddress = await User.findByIdAndUpdate(
             req.params.Uid,
-            req.body,
+            {   
+                $pull:{
+                    "savedAddress":{
+                        "_id":addressId
+                    }
+                }
+            },
             {new:true}
         )
-        console.log("updatedUser:",updatedUser)
-        res.status(200).json(updatedUser)
+        console.log("removeAddress:", removeAddress)
+        res.status(200).json(removeAddress)
     } catch (err) {
         res.status(400).json({ error: err.message })
     }
