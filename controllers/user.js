@@ -291,6 +291,9 @@ userController.put('/cart/:id', async (req, res) => {
         console.log("itemId:", itemId)
         const foundItem = await Item.findById(itemId)
         console.log("foundItem:", foundItem)
+        const roundToHundredth = (value) => {
+            return Number(value.toFixed(2));
+        }
 
         const getUser = await User.findOne({_id:id})
         console.log("getUser:",getUser)
@@ -335,7 +338,7 @@ userController.put('/cart/:id', async (req, res) => {
                 {
                     $set: { 
                         "cart.$.qty":newQty,
-                        "cart.$.total":newTotal
+                        "cart.$.total":roundToHundredth(newTotal)
                     }
                 }, 
                 {new:true}

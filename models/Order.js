@@ -42,7 +42,7 @@ const orderSchema = new mongoose.Schema({
     }],
     status:{
         type: String,
-        default: 'Not Accepted'
+        default: 'Pending'
     },
     date: {
         type: String,
