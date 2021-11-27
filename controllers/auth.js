@@ -30,7 +30,7 @@ const register = async (req, res, next) => {
     }
 };
 
-const login = async (req,res) => {
+const login = async (req, res) => {
     try{
         const loggingUser = req.body.user;
         const foundUser = await User.findOne({ user: loggingUser });
@@ -45,12 +45,13 @@ const login = async (req,res) => {
     }
 }
 
-router.get("/logout", requireToken, async (req, res, next) => {
+router.get("/logout", async (req, res, next) => {
     try{
-        const currentUser = req.user.username
+        const currentUser = req.user
+        console.log("currentUser:",currentUser)
         delete req.user
         res.status(200).json({
-            message: `${currentUser} is logged in!`,
+            message: `${currentUser} is logged out!`,
             isLogged: false,
             token:"",
         });
