@@ -36,6 +36,7 @@ itemController.get("/:id", async (req, res) => {
 itemController.post("/", async (req, res) => {
     try{
         const id = req.params.Uid || req.body.chef
+        console.log('req.body:', req.body)
         const newItem = await Item.create(req.body)
         console.log("newItem:",newItem)
         const foundChef = await Chef.findOneAndUpdate(
