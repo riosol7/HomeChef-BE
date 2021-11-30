@@ -81,6 +81,7 @@ itemController.put("/:id", async (req, res) => {
                     "items.$.chef":updatedItem.chef,
                     "items.$.title":updatedItem.title,
                     "items.$.description":updatedItem.description,
+                    "items.$.timeDuration":updatedItem.timeDuration,
                     "items.$.price":updatedItem.price,
                     "items.$.image":updatedItem.image,
                     "items.$.tags":updatedItem.tags
@@ -100,6 +101,7 @@ itemController.put("/:id", async (req, res) => {
                     "cart.$.item.chef":updatedItem.chef,
                     "cart.$.item.title":updatedItem.title,
                     "cart.$.item.description":updatedItem.description,
+                    "cart.$.item.timeDuration":updatedItem.timeDuration,
                     "cart.$.item.price":updatedItem.price,
                     "cart.$.item.image":updatedItem.image,
                     "cart.$.item.tags":updatedItem.tags
