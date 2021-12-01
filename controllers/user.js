@@ -1,3 +1,4 @@
+require("dotenv").config()
 const mongoose = require("mongoose")
 const express = require("express");
 const User = require("../models/User")
@@ -6,7 +7,7 @@ const Item = require("../models/Item")
 const Order = require("../models/Order")
 const userController = require("express").Router({ mergeParams: true });
 const { createUserToken, requireToken } = require("../middleware/auth");
-
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
 // =============================
 //         READ
 // =============================
@@ -143,6 +144,36 @@ userController.post("/order", async (req, res) => {
         res.status(400).json({ error: err.message })
     }
 })
+
+userController.post("/payment", async (req, res) => {
+    try {
+        const { amount } = req.body;
+        console.log("amount:", amount)
+        console.log("req.body.orderId:",req.body.orderId)
+        const orderId = mongoose.Types.ObjectId(req.body.orderId)
+        console.log("orderId:",orderId)
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount,
+            currency: "usd"
+        });
+        console.log("paymentIntent:",paymentIntent)
+        res.status(200).send(paymentIntent.client_secret);
+
+        const userId = mongoose.Types.ObjectId(req.params.uId)
+        console.log("userId:", userId)
+        const updateOrderIsPaid = await Order.findByIdAndUpdate(orderId,
+            {
+                $set: {
+                    "isPaid": true
+                }
+            },
+            {new:true}
+        )
+        console.log("updateOrderIsPaid:",updateOrderIsPaid)
+    } catch (err) {
+        res.status(500).json({ statusCode: 500, message: err.message })
+    }
+    })
 
 // =============================
 //         UPDATE
