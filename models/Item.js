@@ -14,7 +14,7 @@ const itemSchema = new mongoose.Schema({
         type: String,
         required: false,
     },
-    options: mongoose.Schema.Types.Mixed,
+    options: [mongoose.Schema.Types.Mixed],
     price: {
         type: Number,
         required: true

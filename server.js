@@ -1,12 +1,15 @@
 // =============================
 //         DEPENDENCIES
 // =============================
+require("./db/db")
+require("dotenv").config()
 const express = require("express");
 const app = express();
 const methodOverride = require("method-override");
 const cors = require("cors");
 const passport = require("passport");
-require("./db/db")
+
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
 
 const PORT = process.env.PORT || 9999;
 
@@ -68,6 +71,21 @@ app.post("/register", (req, res) => {
       }
     });
   });
+
+app.post("/payment", cors(), async (req, res) => {
+    try {
+        const { amount } = req.body;
+        console.log("req.body:",req.body)
+        const paymentIntent = await stripe.paymentIntents.create({
+            amount,
+            currency: "usd"
+        });
+        console.log("paymentIntent:",paymentIntent)
+        res.status(200).send(paymentIntent.client_secret);
+    } catch (err) {
+        res.status(500).json({ statusCode: 500, message: err.message })
+    }
+})
 
 app.listen(PORT, () => {
     console.log(`HomeChef running on port ${PORT}`)
