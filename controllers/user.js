@@ -149,27 +149,12 @@ userController.post("/payment", async (req, res) => {
     try {
         const { amount } = req.body;
         console.log("amount:", amount)
-        console.log("req.body.orderId:",req.body.orderId)
-        const orderId = mongoose.Types.ObjectId(req.body.orderId)
-        console.log("orderId:",orderId)
         const paymentIntent = await stripe.paymentIntents.create({
             amount,
             currency: "usd"
         });
         console.log("paymentIntent:",paymentIntent)
         res.status(200).send(paymentIntent.client_secret);
-
-        const userId = mongoose.Types.ObjectId(req.params.uId)
-        console.log("userId:", userId)
-        const updateOrderIsPaid = await Order.findByIdAndUpdate(orderId,
-            {
-                $set: {
-                    "isPaid": true
-                }
-            },
-            {new:true}
-        )
-        console.log("updateOrderIsPaid:",updateOrderIsPaid)
     } catch (err) {
         res.status(500).json({ statusCode: 500, message: err.message })
     }
@@ -377,6 +362,30 @@ userController.put('/cart/:id', async (req, res) => {
             res.status(200).json(updateCart)
             console.log("updateCart:", updateCart)
         }
+    } catch (err) {
+        res.status(400).json({ error: err.message })
+    }
+})
+
+userController.put("/isPaid", async (req, res) => {
+    try {
+        const orderId = mongoose.Types.ObjectId(req.body._id)
+        console.log("req.body:",req.body)
+        console.log("orderId:",orderId)
+
+        const orderIsPaid = await Order.findOneAndUpdate({
+            _id:orderId
+        },
+            {
+                $set: {
+                    "isPaid": true
+                }
+            },
+            {new:true}
+        )
+        console.log("orderIsPaid:",orderIsPaid)
+        res.status(200).json(orderIsPaid)
+
     } catch (err) {
         res.status(400).json({ error: err.message })
     }
