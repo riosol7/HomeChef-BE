@@ -245,7 +245,7 @@ userController.put("/cart", async (req, res) => {
         );
         console.log('checkCart:', checkCart)
 
-        if(checkCart[0]){
+        if(checkCart[0] && selectedOptions.length === 0){
             const roundToHundredth = (value) => {
                 return Number(value.toFixed(2));
             }
@@ -280,8 +280,7 @@ userController.put("/cart", async (req, res) => {
             )
             console.log("newQty_Total",newQty_Total)
             res.status(200).json(newQty_Total)
-        } else 
-        if(selectedOptions){
+        } else if(selectedOptions && checkCart[0]){
             const roundToHundredth = (value) => {
                 return Number(value.toFixed(2));
             }
@@ -310,7 +309,7 @@ userController.put("/cart", async (req, res) => {
             const roundNewTotal = roundToHundredth(newTotal)
             console.log("roundNewTotal:", roundNewTotal)
 
-            const newQty_Total = await User.findOneAndUpdate(
+            const addNewItemToCart = await User.findOneAndUpdate(
                 {
                     _id:id,
                     "cart._id":foundItem._id,
@@ -324,8 +323,8 @@ userController.put("/cart", async (req, res) => {
                 },
                 {new:true}
             )
-            console.log("newQty_Total",newQty_Total)
-            res.status(200).json(newQty_Total)
+            console.log("addNewItemToCart",addNewItemToCart)
+            res.status(200).json(addNewItemToCart)
 
         } else {
             const foundUser = await User.findOneAndUpdate(
