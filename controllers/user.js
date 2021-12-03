@@ -223,15 +223,17 @@ userController.put("/removeAddress/:id", async (req, res) => {
 // -- User adds item to their cart (matching itemID, sum Qty, calculate total) --
 userController.put("/cart", async (req, res) => {
     try{
+        const roundToHundredth = (value) => {
+            return Number(value.toFixed(2));
+        }
         const id = req.params.Uid 
         const itemId = req.body._id
         console.log("itemId:",itemId)
         const foundItem = await Item.findById(itemId)
         console.log("found Item",foundItem)
         const total = foundItem.price * req.body.qty
-        const roundToHundredth = (value) => {
-            return Number(value.toFixed(2));
-        }
+        const selectedOptions = req.body.options
+        console.log("selectedOptions:",selectedOptions)
         const roundTotal = roundToHundredth(total)
         console.log("roundTotal",roundTotal)
 
@@ -244,19 +246,24 @@ userController.put("/cart", async (req, res) => {
         console.log('checkCart:', checkCart)
 
         if(checkCart[0]){
-            const oldQty = checkCart[0].qty
-            console.log("oldQty:",oldQty)
-            const oldTotal = checkCart[0].total
-            console.log("oldTotal:",oldTotal)
-            const newQty = oldQty + parseInt(req.body.qty)
-            const newTotal = newQty * foundItem.price
-            console.log("newQty:",newQty)
-            console.log("newTotal:",newTotal)
             const roundToHundredth = (value) => {
                 return Number(value.toFixed(2));
             }
+            const oldQty = checkCart[0].qty
+            console.log("oldQty:",oldQty)
+
+            const oldTotal = checkCart[0].total
+            console.log("oldTotal:",oldTotal)
+
+            const newQty = oldQty + parseInt(req.body.qty)
+            console.log("newQty:",newQty)
+            // const newOptionTotal = newQty * roundOptionTotal 
+            const newTotal = newQty * foundItem.price
+            console.log("newTotal:",newTotal)
+        
             const roundNewTotal = roundToHundredth(newTotal)
             console.log("roundNewTotal:", roundNewTotal)
+
             const newQty_Total = await User.findOneAndUpdate(
                 {
                     _id:id,
@@ -265,6 +272,7 @@ userController.put("/cart", async (req, res) => {
                 {
                     $set:{
                         "cart.$.qty":newQty,
+                        // "cart.$.options":selectedOptions,
                         "cart.$.total":roundNewTotal
                     }
                 },
@@ -272,6 +280,53 @@ userController.put("/cart", async (req, res) => {
             )
             console.log("newQty_Total",newQty_Total)
             res.status(200).json(newQty_Total)
+        } else 
+        if(selectedOptions){
+            const roundToHundredth = (value) => {
+                return Number(value.toFixed(2));
+            }
+            const oldQty = checkCart[0].qty
+            console.log("oldQty:",oldQty)
+
+            const oldTotal = checkCart[0].total
+            console.log("oldTotal:",oldTotal)
+
+            const newQty = oldQty + parseInt(req.body.qty)
+            console.log("newQty:",newQty)
+
+            const totalArr = selectedOptions.map(option => option.price)
+            console.log("totalArr:", totalArr)
+
+            const optionTotalB = totalArr.reduce((a, b) => a + b, 0)
+            console.log("optionTotalB:",optionTotalB)
+
+            const optionTotal = Number(optionTotalB)
+            const roundOptionTotal = roundToHundredth(optionTotal)
+            console.log("roundOptionTotal:", roundOptionTotal)
+
+            const newOptionTotal = newQty * roundOptionTotal 
+            const totalNoOptions = newQty * foundItem.price
+            const newTotal = newOptionTotal + totalNoOptions 
+            const roundNewTotal = roundToHundredth(newTotal)
+            console.log("roundNewTotal:", roundNewTotal)
+
+            const newQty_Total = await User.findOneAndUpdate(
+                {
+                    _id:id,
+                    "cart._id":foundItem._id,
+                },
+                {
+                    $set:{
+                        "cart.$.qty":newQty,
+                        "cart.$.options":selectedOptions,
+                        "cart.$.total":roundNewTotal
+                    }
+                },
+                {new:true}
+            )
+            console.log("newQty_Total",newQty_Total)
+            res.status(200).json(newQty_Total)
+
         } else {
             const foundUser = await User.findOneAndUpdate(
                 {_id:id}, 
@@ -282,6 +337,7 @@ userController.put("/cart", async (req, res) => {
                             "chef": foundItem.chef, 
                             "item": foundItem, 
                             "qty": req.body.qty,
+                            // "options": selectedOptions,
                             "total": roundTotal
                         }
                     }
@@ -291,6 +347,24 @@ userController.put("/cart", async (req, res) => {
             console.log("found User:",foundUser)
             res.status(200).json(foundUser)
         }
+
+       
+
+            // const roundToHundredth = (value) => {
+            //     return Number(value.toFixed(2));
+            // }
+            // const totalArr = selectedOptions.map(option => option.price)
+            // console.log("totalArr:", totalArr)
+            // const optionTotalB = totalArr.reduce((a, b) => a + b, 0)
+            // console.log("optionTotalB:",optionTotalB)
+            // const optionTotal = Number(optionTotalB)
+            // const roundOptionTotal = roundToHundredth(optionTotal)
+            // console.log("roundOptionTotal:", roundOptionTotal)
+            // const newOptionTotal = req.body.qty * roundOptionTotal 
+            // const totalNoOptions = req.body.qty * foundItem.price
+            // const newTotal = newOptionTotal + totalNoOptions 
+  
+        
     } catch (err) {
         res.status(400).json({ error: err.message })
     }

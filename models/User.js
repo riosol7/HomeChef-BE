@@ -39,6 +39,7 @@ const userSchema = new mongoose.Schema({
             type: mongoose.Schema.Types.Mixed,
             ref: 'Item',
         },
+        options:[mongoose.Schema.Types.Mixed],
         qty: {
             type: Number,
             default: 0  
