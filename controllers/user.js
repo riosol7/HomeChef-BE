@@ -315,7 +315,7 @@ userController.put("/cart", async (req, res) => {
             const roundNewTotal = roundToHundredth(newTotal)
             console.log("roundNewTotal:", roundNewTotal)
 
-            const addNewItemToCart = await User.findOneAndUpdate(
+            const overrideItemToCart = await User.findOneAndUpdate(
                 {
                     _id:id,
                     "cart._id":foundItem._id,
@@ -329,9 +329,48 @@ userController.put("/cart", async (req, res) => {
                 },
                 {new:true}
             )
+            console.log("overrideItemToCart ",overrideItemToCart )
+            res.status(200).json(overrideItemToCart)
+
+        } else if (selectedOptions && !checkCart[0]) {
+            const roundToHundredth = (value) => {
+                return Number(value.toFixed(2));
+            }
+            const totalArr = selectedOptions.map(option => option.price)
+            console.log("totalArr:", totalArr)
+
+            const optionTotalB = totalArr.reduce((a, b) => a + b, 0)
+            console.log("optionTotalB:",optionTotalB)
+
+            const optionTotal = Number(optionTotalB)
+            const roundOptionTotal = roundToHundredth(optionTotal)
+            console.log("roundOptionTotal:", roundOptionTotal)
+
+            const newOptionTotal = req.body.qty * roundOptionTotal 
+            const totalNoOptions = req.body.qty * foundItem.price
+            const newTotal = newOptionTotal + totalNoOptions 
+            const roundNewTotal = roundToHundredth(newTotal)
+            console.log("roundNewTotal:", roundNewTotal)
+
+            const addNewItemToCart = await User.findOneAndUpdate(
+                {_id:id},
+                {
+                    $push: { 
+                        "cart": {
+                            "_id": foundItem._id,
+                            "chef": foundItem.chef, 
+                            "item": foundItem,
+                            "options": selectedOptions, 
+                            "qty": req.body.qty,
+                            "total": roundTotal
+                        }
+                    }
+                },
+                {new: true}
+            ).populate("cart").exec();
             console.log("addNewItemToCart",addNewItemToCart)
             res.status(200).json(addNewItemToCart)
-
+        
         } else {
             const foundUser = await User.findOneAndUpdate(
                 {_id:id}, 
