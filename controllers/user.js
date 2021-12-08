@@ -249,7 +249,7 @@ userController.put("/cart", async (req, res) => {
         );
         console.log('checkCart:', checkCart)
 
-        if(checkCart[0] && selectedOptions.length === 0){
+        if(checkCart[0] && selectedOptions === undefined){
             const roundToHundredth = (value) => {
                 return Number(value.toFixed(2));
             }
@@ -400,7 +400,7 @@ userController.put('/cart/:id', async (req, res) => {
             )
             res.status(200).json(foundUser)
             console.log("foundUser:", foundUser)
-            
+
         }  else if(checkCart[0].options) {
             const newQty = req.body.qty
             
