@@ -22,14 +22,16 @@ const orderSchema = new mongoose.Schema({
             ref: 'User',
             required: true,
         },
-        firstName: { type: String },
-        lastName: { type: String },
+        fullName: { type: String },
         address: {
             street: String,
             apt: String,
             city: String,
             zip: String,
-            state: String,
+            state: {
+                type: String,
+                maxLength: 2
+            },
             lat: Number,
             lng: Number,
         },

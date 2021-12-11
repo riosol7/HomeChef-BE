@@ -14,14 +14,19 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: false
     },
-    firstName: { type: String },
-    lastName: { type: String },
+    fullName: {
+        type:String,
+        required: true
+    },
     address: {
         street: String,
         apt: String,
         city: String,
         zip: String,
-        state: String,
+        state: {
+            type: String,
+            maxLength: 2
+        },
         lat: Number,
         lng: Number,
     },
@@ -74,7 +79,10 @@ const userSchema = new mongoose.Schema({
         apt: String,
         city: String,
         zip: String,
-        state: String,
+        state: {
+            type: String,
+            maxLength: 2
+        },
         lat: Number,
         lng: Number
     }]

@@ -83,8 +83,7 @@ userController.post("/order", async (req, res) => {
         const orderInfo = await Order.create({
             user: {
                 userId: getUser._id,
-                firstName: req.body.firstName,
-                lastName: req.body.lastName,
+                fullName: req.body.fullName,
                 address:{
                     street: req.body.street,
                     apt: req.body.apt,

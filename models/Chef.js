@@ -13,7 +13,10 @@ const chefSchema = new mongoose.Schema({
     address: {
         street: String,
         city: String,
-        state: String,
+        state: {
+            type: String,
+            maxLength: 2
+        },
         zip: String,
         lat: Number,
         lng: Number
