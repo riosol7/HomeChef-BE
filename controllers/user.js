@@ -338,7 +338,7 @@ userController.put("/cart", async (req, res) => {
             const totalArr = selectedOptions.map(option => option.price)
             console.log("totalArr:", totalArr)
 
-            const optionTotalB = totalArr.reduce((a, b) => a + b, 0)
+            const optionTotalB = totalArr.reduce((a, b) => Number(a) + Number(b), 0)
             console.log("optionTotalB:",optionTotalB)
 
             const optionTotal = Number(optionTotalB)
