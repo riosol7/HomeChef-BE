@@ -65,14 +65,8 @@ const userSchema = new mongoose.Schema({
         }
     }],
     orderHistory: [{
-        _id: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Order'
-        },
-        order: {
-            type: mongoose.Schema.Types.Mixed,
-            ref: 'Order'
-        }
+        type: mongoose.Schema.Types.Mixed,
+        ref: 'Order'
     }],
     savedAddress: [{
         street: String,

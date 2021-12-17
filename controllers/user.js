@@ -137,11 +137,10 @@ userController.post("/order", async (req, res) => {
             {new:true} 
         )
         console.log("subTotal:",subTotal)
-
         res.status(200).json(newOrder)
-    } catch (err) {
-        res.status(400).json({ error: err.message })
-    }
+        } catch (err) {
+            res.status(400).json({ error: err.message })
+        }
 })
 
 userController.post("/payment", async (req, res) => {
@@ -500,15 +499,40 @@ userController.put('/cart/:id', async (req, res) => {
     }
 })
 
+//-- Only remove Item from cart --
+userController.put("/cart/remove/:id", async (req, res) => {
+    try{
+        const id = req.params.Uid
+        const itemId = req.body._id || req.params.id
+        console.log("itemId:", itemId)
+        const foundItem = await Item.findById(itemId)
+
+        const removeItemFromCart = await User.findOneAndUpdate(
+            {_id:id},
+            {
+                $pull: { 
+                    "cart": {
+                        "_id": foundItem._id,
+                    }
+                }
+            }, 
+            {new:true}
+        )
+        res.status(200).json(removeItemFromCart)
+        console.log("removeItemFromCart:", removeItemFromCart)
+    } catch (err) {
+        res.status(400).json({ error: err.message })
+    }
+})
+
 userController.put("/isPaid", async (req, res) => {
     try {
         const orderId = mongoose.Types.ObjectId(req.body._id)
         console.log("req.body:",req.body)
         console.log("orderId:",orderId)
 
-        const orderIsPaid = await Order.findOneAndUpdate({
-            _id:orderId
-        },
+        const orderIsPaid = await Order.findOneAndUpdate(
+            {_id:orderId},
             {
                 $set: {
                     "isPaid": true
@@ -517,6 +541,18 @@ userController.put("/isPaid", async (req, res) => {
             {new:true}
         )
         console.log("orderIsPaid:",orderIsPaid)
+
+        const orderHistory = await User.findOneAndUpdate(
+            {_id:req.params.Uid},
+            {
+                $push: {
+                    "orderHistory": orderIsPaid 
+                },
+            },
+            {new:true},
+        )
+        console.log("orderHistory:", orderHistory)
+
         res.status(200).json(orderIsPaid)
 
     } catch (err) {
