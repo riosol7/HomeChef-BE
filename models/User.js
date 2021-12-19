@@ -18,6 +18,7 @@ const userSchema = new mongoose.Schema({
         type:String,
         required: true
     },
+    image: String,
     address: {
         street: String,
         apt: String,
