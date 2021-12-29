@@ -26,9 +26,11 @@ const itemSchema = new mongoose.Schema({
         required: true
     },
     likes:{
-        type: Number,
-        required: false,
-        default: 0
+        likeTotal:{ 
+            type: Number,
+            default: 0,
+        },
+        by: [mongoose.Schema.Types.Mixed],
     },
     tags:[String]
 }, {timestamp:true})
