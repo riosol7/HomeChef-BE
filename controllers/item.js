@@ -124,6 +124,23 @@ itemController.put("/:id", async (req, res) => {
 itemController.put("/like/:id", async (req, res) => {
     const foundItem = await Item.findById(req.params.id)
     const foundUser = await User.findById(req.params.Uid)
+    const chefItemLiked = await Chef.findOneAndUpdate(
+        {
+            _id:foundItem.chef,
+            "items._id":foundItem._id
+        },
+        {
+            $set: {
+                "items.$.likeTotal": Number(foundItem.likeTotal) + 1,
+            },
+            $push: {
+                "items.$.likes": foundUser.user
+            },
+        },
+        {new:true}
+    )
+    console.log('chefItemLiked:', chefItemLiked)
+
     const likeItem = await Item.findByIdAndUpdate(
         req.params.id,
         {
@@ -143,7 +160,23 @@ itemController.put("/like/:id", async (req, res) => {
 itemController.put("/unlike/:id", async (req, res) => {
     const foundItem = await Item.findById(req.params.id)
     const foundUser = await User.findById(req.params.Uid)
-    const likeItem = await Item.findByIdAndUpdate(
+    const chefItemUnliked = await Chef.findOneAndUpdate(
+        {
+            _id:foundItem.chef,
+            "items._id":foundItem._id
+        },
+        {
+            $set: {
+                "items.$.likeTotal": Number(foundItem.likeTotal) - 1,
+            },
+            $pull: {
+                "items.$.likes": foundUser.user
+            },
+        },
+        {new:true}
+    )
+    console.log('chefItemUnliked:', chefItemUnliked)
+    const unlikeItem = await Item.findByIdAndUpdate(
         req.params.id,
         {
             $set:{
@@ -155,8 +188,8 @@ itemController.put("/unlike/:id", async (req, res) => {
         },
         {new:true}
     )
-    console.log('likeItem:', likeItem)
-    res.status(200).json(likeItem)
+    console.log('likeItem:', unlikeItem)
+    res.status(200).json(unlikeItem)
 })
 
 // =============================
