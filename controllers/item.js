@@ -115,11 +115,48 @@ itemController.put("/:id", async (req, res) => {
             }
         )
         console.log('cartArr:', cartArr)
-
         res.status(200).json(updatedItem)
     } catch (err) {
         res.status(400).json({ error: error.message })
     }
+})
+
+itemController.put("/like/:id", async (req, res) => {
+    const foundItem = await Item.findById(req.params.id)
+    const foundUser = await User.findById(req.params.Uid)
+    const likeItem = await Item.findByIdAndUpdate(
+        req.params.id,
+        {
+            $set:{
+                "likeTotal": Number(foundItem.likeTotal) + 1,
+            },
+            $push:{
+                "likes": foundUser.user
+            }
+        },
+        {new:true}
+    )
+    console.log('likeItem:', likeItem)
+    res.status(200).json(likeItem)
+})
+
+itemController.put("/unlike/:id", async (req, res) => {
+    const foundItem = await Item.findById(req.params.id)
+    const foundUser = await User.findById(req.params.Uid)
+    const likeItem = await Item.findByIdAndUpdate(
+        req.params.id,
+        {
+            $set:{
+                "likeTotal": Number(foundItem.likeTotal) - 1,
+            },
+            $pull:{
+                "likes": foundUser.user
+            }
+        },
+        {new:true}
+    )
+    console.log('likeItem:', likeItem)
+    res.status(200).json(likeItem)
 })
 
 // =============================

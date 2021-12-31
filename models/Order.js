@@ -22,7 +22,7 @@ const orderSchema = new mongoose.Schema({
             ref: 'User',
             required: true,
         },
-        fullName: { type: String },
+        fullName: String,
         address: {
             street: String,
             apt: String,
