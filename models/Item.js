@@ -30,7 +30,9 @@ const itemSchema = new mongoose.Schema({
         default: 0,
     },
     likes:[String],
-    tags:[String]
+    tags:[String],
+    QA:[mongoose.Schema.Types.Mixed],
+    reviews:[mongoose.Schema.Types.Mixed],
 }, {timestamp:true})
 
 module.exports = mongoose.model('Item', itemSchema)
