@@ -67,16 +67,16 @@ chefController.get("/item/:id", async (req, res) => {
 })
 
 // -- Find chef By ID --
-// chefController.get("/:id", async (req, res) => {
-//     try{
-//         cId = req.params.id
-//         console.log("cId:", cId)
-//         const foundChef = await Chef.findById(req.params.id)
-//         res.status(200).json(foundChef)
-//     } catch (err) {
-//         res.status(400).json({ error: err.message })
-//     }
-// })
+chefController.get("/:id", async (req, res) => {
+    try{
+        cId = req.params.id
+        console.log("cId:", cId)
+        const foundChef = await Chef.findById(req.params.id)
+        res.status(200).json(foundChef)
+    } catch (err) {
+        res.status(400).json({ error: err.message })
+    }
+})
 
 // =============================
 //         CREATE
