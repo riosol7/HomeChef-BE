@@ -29,6 +29,7 @@ const chefSchema = new mongoose.Schema({
     bio: {type: String},
     availability: {type: String},
     rating: {type: Number, default:0},
+    reviews:[mongoose.Schema.Types.Mixed],
     items: [{
         type: mongoose.Schema.Types.Mixed,
         ref: 'Item'
