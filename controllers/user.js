@@ -137,6 +137,10 @@ userController.post("/order", async (req, res) => {
             {new:true} 
         )
         console.log("subTotal:",subTotal)
+
+        // const orderChef = await Chef.findByIdAndUpdate(
+        //     ,
+        // )
         res.status(200).json(newOrder)
         } catch (err) {
             res.status(400).json({ error: err.message })

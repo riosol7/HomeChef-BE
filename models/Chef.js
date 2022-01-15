@@ -33,6 +33,10 @@ const chefSchema = new mongoose.Schema({
     items: [{
         type: mongoose.Schema.Types.Mixed,
         ref: 'Item'
+    }],
+    orders: [{
+        type: mongoose.Schema.Types.Mixed,
+        ref:'Order'
     }], 
 }, {timestamps: true})
 
